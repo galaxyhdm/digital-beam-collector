@@ -2,6 +2,8 @@ package dev.markusk.digitalbeam.collector.data;
 
 import dev.markusk.digitalbeam.collector.Environment;
 import dev.markusk.digitalbeam.collector.VersionInfo;
+import dev.markusk.digitalbeam.collector.model.Target;
+import dev.markusk.digitalbeam.collector.model.builder.TargetBuilder;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -12,8 +14,13 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import javax.sql.PooledConnection;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 
 public class PostgresDataManager implements AbstractDataManager {
@@ -27,6 +34,7 @@ public class PostgresDataManager implements AbstractDataManager {
 
   @Override
   public boolean initialize(final Logger logger, final String connectionUrl) {
+    if(connectionUrl == null || connectionUrl.isEmpty()) return false;
     this.logger = logger;
     this.logger.info("Connecting to postgres-database...");
 
@@ -42,13 +50,41 @@ public class PostgresDataManager implements AbstractDataManager {
         this.logger.info(String.format("Connected to sql-database. (Database: %s)", this.dataSource.getDatabaseName()));
         return true;
       } else {
-        this.logger.error(String.format("Database implementation %s is not supported!", database));
+        this.logger.warn(String.format("Database implementation %s is not supported!", database));
         return false;
       }
     } catch (Exception e) {
       this.logger.error("Error while pooledConnection to database", e);
       return false;
     }
+  }
+
+  @Override
+  public Optional<List<Target>> getTargets() {
+    final List<Target> targets = new ArrayList<>();
+    try (final Connection connection = this.pooledConnection.getConnection()) {
+      try (final PreparedStatement preparedStatement = connection.prepareStatement(Queries.SELECT_TARGETS)) {
+        final ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+          targets.add(getTargetFromResult(resultSet));
+        }
+        return Optional.of(targets);
+      }
+    } catch (SQLException exception) {
+      this.logger.error("Error while executing getTargets", exception);
+    }
+    return Optional.empty();
+  }
+
+  private Target getTargetFromResult(final ResultSet resultSet) throws SQLException {
+    final TargetBuilder targetBuilder = new TargetBuilder();
+    targetBuilder.setSnowflake(resultSet.getString("target_snowflake"));
+    targetBuilder.setName(resultSet.getString("name"));
+    targetBuilder.setShortname(resultSet.getString("shortname"));
+    targetBuilder.setFetchUrl(resultSet.getString("fetch_url"));
+    targetBuilder.setTor(resultSet.getBoolean("tor"));
+    targetBuilder.setWaitTime(resultSet.getInt("wait_time"));
+    return targetBuilder.createTarget();
   }
 
   private void updateDatabase() {
