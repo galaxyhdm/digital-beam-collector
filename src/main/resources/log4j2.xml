@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="dev.markusk.digitalbeam,io.sentry.log4j2">
+    <Properties>
+        <Property name="baseDir">logs</Property>
+    </Properties>
+    <Appenders>
+        <Console name="WINDOWS_COMPAT" target="SYSTEM_OUT"/>
+        <Queue name="TerminalConsole">
+            <PatternLayout pattern="[%d{HH:mm:ss,SSS} %highlight{%level}]: %msg%n"/>
+        </Queue>
+        <RollingRandomAccessFile name="File" fileName="${baseDir}/latest.log" filePattern="${baseDir}/%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="[%d{HH:mm:ss,SSS}] [%t/%level]: %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <OnStartupTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${baseDir}" maxDepth="1">
+                    <IfFileName glob="????-??-??-*.log.gz">
+                        <IfAny>
+                            <IfAccumulatedFileCount exceeds="30"/>
+                        </IfAny>
+                    </IfFileName>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+        <Sentry name="Sentry"/>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info" additivity="false">
+            <AppenderRef ref="Sentry"/>
+            <AppenderRef ref="WINDOWS_COMPAT"/>
+            <AppenderRef ref="File"/>
+            <AppenderRef ref="TerminalConsole"/>
+        </Root>
+    </Loggers>
+</Configuration>

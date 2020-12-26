@@ -1,19 +1,124 @@
-plugins {
-    id 'java'
+import org.apache.tools.ant.filters.ReplaceTokens
+
+buildscript {
+    dependencies {
+        classpath 'com.pascalwelsch.gitversioner:gitversioner:0.4.1'
+    }
 }
 
-group 'dev.markusk'
-version '0.0.1'
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+}
+
+sourceCompatibility = 14
+targetCompatibility = 14
+
+String mainClassName = 'dev.markusk.digitalbeam.collector.Launcher'
 
 repositories {
+    mavenLocal()
     mavenCentral()
+    jcenter()
+    maven {
+        url 'https://jitpack.io'
+    }
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    // https://mvnrepository.com/artifact/org.influxdb/influxdb-java
+    implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.5'
+    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.26'
+    //Sentry
+    implementation 'io.sentry:sentry-log4j2:3.2.0'
+
+    /*Logging and console*/
+    implementation 'net.sf.jopt-simple:jopt-simple:6.0-alpha-3'
+    implementation 'org.jline:jline:3.10.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.0'
+    /*--Logging and console--*/
+
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
-test {
-    useJUnitPlatform()
+// https://github.com/passsy/gradle-gitVersioner-plugin
+apply plugin: 'com.pascalwelsch.gitversioner'
+gitVersioner {
+
+    def base = System.getProperty("base_branch") != null ? System.getProperty("base_branch") : System.getenv("BASE_BRANCH")
+    def snap = System.getProperty("snapshot") != null ? System.getProperty("snapshot") : System.getenv("SNAP")
+
+    baseBranch base == null ? 'development' : base
+    def snapshot = snap == null ? true : snap != 'false'
+    addSnapshot snapshot
+
+    addLocalChangesDetails false
+    if (snapshot) {
+        formatter = { gitVersioner ->
+            return "${gitVersioner.currentSha1Short}-SNAPSHOT"
+        }
+    }
+}
+
+group 'dev.markusk'
+version gitVersioner.versionName
+
+processResources {
+    filter(ReplaceTokens, tokens: [VERSION: version])
+}
+
+task sourcesForRelease(type: Copy) {
+    from 'src/main/java'
+    into 'build/filteredSrc'
+    filter(ReplaceTokens, tokens: [VERSION: version, DATE: getBuildDate(), TIME: getBuildTime()])
+}
+
+static def getBuildDate() {
+    return new Date().format('yyyy/MM/dd')
+}
+
+static def getBuildTime() {
+    return new Date().format('HH:mm:ss')
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+
+    source = sourcesForRelease.destinationDir
+    classpath = sourceSets.main.compileClasspath
+    dependsOn sourcesForRelease
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set('sources')
+    from "${buildDir}/filteredSrc"
+}
+
+jar {
+    archivesBaseName = project.name
+    manifest {
+        attributes('Implementation-Version': archiveVersion, 'Main-Class': mainClassName)
+        attributes 'Multi-Release': 'true'
+    }
+}
+
+shadowJar {
+    archiveClassifier.set('withDependencies')
+}
+
+build {
+    dependsOn clean
+    dependsOn jar
+    dependsOn sourcesJar
+    dependsOn shadowJar
+
+    jar.mustRunAfter clean
+    shadowJar.mustRunAfter sourcesJar
+}
+
+task getGitVersion {
+    println gitVersioner.versionName
 }
