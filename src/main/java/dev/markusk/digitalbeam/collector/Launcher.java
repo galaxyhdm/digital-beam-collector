@@ -19,6 +19,8 @@ public class Launcher {
         "           __/ |                                                                                          \n" +
         "          |___/                                                                                           \n" +
         "\n");
+
+    this.setProperties();
     final Collector collector = new Collector(optionSet);
     collector.initialize();
   }
@@ -35,6 +37,11 @@ public class Launcher {
       System.exit(-1);
     }
     new Launcher(optionSet);
+  }
+
+  private void setProperties(){
+    System.setProperty("sentry.release", VersionInfo.VERSION);
+    System.setProperty("sentry.environment", VersionInfo.DEBUG ? "development" : "production");
   }
 
   private static OptionParser createOptionParser() {

@@ -19,7 +19,7 @@ public class VersionInfo {
     //noinspection ConstantConditions
     BUILD_TIME = BUILD_TIME_RAW.startsWith("@") ? "DEBUG_BUILD" : BUILD_TIME_RAW;
     //noinspection ConstantConditions
-    DEBUG = VERSION_RAW.startsWith("@");
+    DEBUG = VERSION_RAW.startsWith("@") || VERSION_RAW.endsWith("-SNAPSHOT");
   }
 
 }

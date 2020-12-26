@@ -2,6 +2,7 @@ package dev.markusk.digitalbeam.collector;
 
 import dev.markusk.digitalbeam.collector.console.BetterSystemOut;
 import dev.markusk.digitalbeam.collector.console.ConsoleController;
+import dev.markusk.digitalbeam.collector.data.PostgresDataManager;
 import joptsimple.OptionSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,6 +14,7 @@ public class Collector {
   private final OptionSet optionSet;
 
   private ConsoleController consoleController;
+  private PostgresDataManager postgresDataManager;
 
   private boolean running;
 
@@ -28,6 +30,13 @@ public class Collector {
     LOGGER.info(String
         .format("Starting collector... (Version Nr. %s built on %s at %s)", VersionInfo.VERSION, VersionInfo.BUILD_DATE,
             VersionInfo.BUILD_TIME));
+
+    this.postgresDataManager = new PostgresDataManager();
+    this.postgresDataManager.initialize(LOGGER, Environment.CONNECTION_URL);
+  }
+
+  public PostgresDataManager getPostgresDataManager() {
+    return this.postgresDataManager;
   }
 
   private void setupConsole() {

@@ -33,6 +33,10 @@ dependencies {
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.27'
     //Sentry
     implementation 'io.sentry:sentry-log4j2:3.2.0'
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+    // https://mvnrepository.com/artifact/org.liquibase/liquibase-core
+    implementation group: 'org.liquibase', name: 'liquibase-core', version: '4.2.2'
 
     /*Logging and console*/
     implementation 'net.sf.jopt-simple:jopt-simple:6.0-alpha-3'
