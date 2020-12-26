@@ -34,7 +34,7 @@ public class PostgresDataManager implements AbstractDataManager {
 
   @Override
   public boolean initialize(final Logger logger, final String connectionUrl) {
-    if(connectionUrl == null || connectionUrl.isEmpty()) return false;
+    if (connectionUrl == null || connectionUrl.isEmpty()) return false;
     this.logger = logger;
     this.logger.info("Connecting to postgres-database...");
 
