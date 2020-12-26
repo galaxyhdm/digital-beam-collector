@@ -85,10 +85,4 @@ public class PostgresDataManager implements AbstractDataManager {
     this.logger.info("SqlDataSource closed!");
   }
 
-/*  private void setupLiquibaseLogger() {
-    final org.slf4j.Logger liquibaseLogger = LoggerFactory.getLogger("liquibase");
-    if (!(liquibaseLogger instanceof ch.qos.logback.classic.Logger)) return;
-    ((ch.qos.logback.classic.Logger) liquibaseLogger).setLevel(Environment.DEBUG ? Level.INFO : Level.OFF);
-  } */
-
 }

@@ -39,7 +39,7 @@ public class Launcher {
     new Launcher(optionSet);
   }
 
-  private void setProperties(){
+  private void setProperties() {
     System.setProperty("sentry.release", VersionInfo.VERSION);
     System.setProperty("sentry.environment", VersionInfo.DEBUG ? "development" : "production");
   }
