@@ -36,7 +36,7 @@ public class SslBuilder {
       final CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
       final Certificate certificate;
       LOGGER.debug("Loading letsencrypt certificate...");
-      try (final InputStream stream = new URL(Environment.CERT_URL).openStream()) { // TODO: 27.12.20 make env var
+      try (final InputStream stream = new URL(Environment.CERT_URL).openStream()) {
         certificate = certificateFactory.generateCertificate(stream);
       }
       keyStore.load(null, null);
