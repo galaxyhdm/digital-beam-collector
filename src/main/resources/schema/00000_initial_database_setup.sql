@@ -13,6 +13,7 @@ create table if not exists targets
     fetch_url        text                               not null,
     tor              boolean default false              not null,
     wait_time        integer default 5                  not null,
+    active           boolean default true               not null,
     constraint targets_pk
     primary key (target_snowflake)
     );
@@ -142,3 +143,16 @@ create table if not exists status
 create unique index if not exists status_article_snowflake_uindex
     on status (article_snowflake);
 --rollback DROP TABLE status
+
+-- changeset markusk:1609000655972-9
+create table if not exists user_agents
+(
+    user_agent_snowflake uuid default uuid_generate_v4() not null,
+    user_agent           text                            not null,
+    constraint user_agents_pk
+    primary key (user_agent_snowflake)
+    );
+
+create unique index if not exists user_agents_user_agent_snowflake_uindex
+    on user_agents (user_agent_snowflake);
+--rollback DROP TABLE user_agents

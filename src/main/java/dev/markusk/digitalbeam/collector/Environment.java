@@ -13,4 +13,7 @@ public class Environment {
   public static final String CONNECTION_URL =
       System.getenv("CONNECTION_URL") != null ? String.valueOf(System.getenv("CONNECTION_URL")) : "";
 
+  public static final String CERT_URL =
+      System.getenv("CERT_URL") != null ? String.valueOf(System.getenv("CERT_URL")) : "";
+
 }

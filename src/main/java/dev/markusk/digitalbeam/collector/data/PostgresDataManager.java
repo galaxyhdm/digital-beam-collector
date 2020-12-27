@@ -3,7 +3,9 @@ package dev.markusk.digitalbeam.collector.data;
 import dev.markusk.digitalbeam.collector.Environment;
 import dev.markusk.digitalbeam.collector.VersionInfo;
 import dev.markusk.digitalbeam.collector.model.Target;
+import dev.markusk.digitalbeam.collector.model.UserAgent;
 import dev.markusk.digitalbeam.collector.model.builder.TargetBuilder;
+import dev.markusk.digitalbeam.collector.model.builder.UserAgentBuilder;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -23,10 +25,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 
+import static dev.markusk.digitalbeam.collector.data.Queries.SELECT_TARGETS;
+import static dev.markusk.digitalbeam.collector.data.Queries.SELECT_USER_AGENTS;
+
 public class PostgresDataManager implements AbstractDataManager {
 
   private static final String ACCEPTED_DATABASE = "postgresql";
-  private final static String SCHEMA_FILE = "schema/db.changelog-main.xml";
+  private static final String SCHEMA_FILE = "schema/db.changelog-main.xml";
 
   private Logger logger;
   private PGConnectionPoolDataSource dataSource;
@@ -63,12 +68,29 @@ public class PostgresDataManager implements AbstractDataManager {
   public Optional<List<Target>> getTargets() {
     final List<Target> targets = new ArrayList<>();
     try (final Connection connection = this.pooledConnection.getConnection()) {
-      try (final PreparedStatement preparedStatement = connection.prepareStatement(Queries.SELECT_TARGETS)) {
+      try (final PreparedStatement preparedStatement = connection.prepareStatement(SELECT_TARGETS)) {
         final ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()) {
           targets.add(getTargetFromResult(resultSet));
         }
         return Optional.of(targets);
+      }
+    } catch (SQLException exception) {
+      this.logger.error("Error while executing getTargets", exception);
+    }
+    return Optional.empty();
+  }
+
+  @Override
+  public Optional<List<UserAgent>> getUserAgents() {
+    final List<UserAgent> userAgents = new ArrayList<>();
+    try (final Connection connection = this.pooledConnection.getConnection()) {
+      try (final PreparedStatement preparedStatement = connection.prepareStatement(SELECT_USER_AGENTS)) {
+        final ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+          userAgents.add(getUserAgentFromResult(resultSet));
+        }
+        return Optional.of(userAgents);
       }
     } catch (SQLException exception) {
       this.logger.error("Error while executing getTargets", exception);
@@ -85,6 +107,13 @@ public class PostgresDataManager implements AbstractDataManager {
     targetBuilder.setTor(resultSet.getBoolean("tor"));
     targetBuilder.setWaitTime(resultSet.getInt("wait_time"));
     return targetBuilder.createTarget();
+  }
+
+  private UserAgent getUserAgentFromResult(final ResultSet resultSet) throws SQLException {
+    final UserAgentBuilder userAgentBuilder = new UserAgentBuilder();
+    userAgentBuilder.setSnowflake(resultSet.getString("user_agent_snowflake"));
+    userAgentBuilder.setUserAgent(resultSet.getString("user_agent"));
+    return userAgentBuilder.createUserAgent();
   }
 
   private void updateDatabase() {
