@@ -106,6 +106,8 @@ public class PostgresDataManager implements AbstractDataManager {
     targetBuilder.setFetchUrl(resultSet.getString("fetch_url"));
     targetBuilder.setTor(resultSet.getBoolean("tor"));
     targetBuilder.setWaitTime(resultSet.getInt("wait_time"));
+    targetBuilder.setDatePattern(resultSet.getString("date_pattern"));
+    targetBuilder.setActive(resultSet.getBoolean("active"));
     return targetBuilder.createTarget();
   }
 

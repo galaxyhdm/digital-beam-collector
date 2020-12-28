@@ -9,6 +9,8 @@ public class TargetBuilder {
   private String fetchUrl;
   private boolean tor;
   private int waitTime;
+  private String datePattern;
+  private boolean active;
 
   public TargetBuilder setSnowflake(final String snowflake) {
     this.snowflake = snowflake;
@@ -40,7 +42,17 @@ public class TargetBuilder {
     return this;
   }
 
+  public TargetBuilder setDatePattern(final String datePattern) {
+    this.datePattern = datePattern;
+    return this;
+  }
+
+  public TargetBuilder setActive(final boolean active) {
+    this.active = active;
+    return this;
+  }
+
   public Target createTarget() {
-    return new Target(snowflake, name, shortname, fetchUrl, tor, waitTime);
+    return new Target(snowflake, name, shortname, fetchUrl, tor, waitTime, datePattern, active);
   }
 }

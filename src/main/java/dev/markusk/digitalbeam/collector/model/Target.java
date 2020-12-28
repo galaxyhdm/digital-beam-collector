@@ -10,9 +10,13 @@ public class Target implements Snowflake {
   private final String fetchUrl;
   private final boolean tor;
   private final int waitTime;
+  private final String datePattern;
+  private final boolean active;
 
   public Target(final String snowflake, final String name, final String shortname, final String fetchUrl,
-      final boolean tor, final int waitTime) {
+      final boolean tor, final int waitTime, final String datePattern, final boolean active) {
+    this.datePattern = datePattern;
+    this.active = active;
     Objects.requireNonNull(snowflake);
     this.snowflake = snowflake;
     this.name = name;
@@ -40,6 +44,14 @@ public class Target implements Snowflake {
 
   public int getWaitTime() {
     return this.waitTime;
+  }
+
+  public String getDatePattern() {
+    return this.datePattern;
+  }
+
+  public boolean isActive() {
+    return this.active;
   }
 
   @Override
