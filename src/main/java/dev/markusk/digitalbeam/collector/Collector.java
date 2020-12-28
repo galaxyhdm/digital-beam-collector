@@ -5,9 +5,12 @@ import dev.markusk.digitalbeam.collector.console.ConsoleController;
 import dev.markusk.digitalbeam.collector.data.AbstractDataManager;
 import dev.markusk.digitalbeam.collector.data.PostgresDataManager;
 import dev.markusk.digitalbeam.collector.misc.SslBuilder;
+import dev.markusk.digitalbeam.collector.model.UserAgent;
 import joptsimple.OptionSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
 
 public class Collector {
 
@@ -18,6 +21,7 @@ public class Collector {
   private ConsoleController consoleController;
   private AbstractDataManager dataManager;
   private SslBuilder sslBuilder;
+  private List<UserAgent> userAgents;
 
   private boolean running;
 
@@ -38,10 +42,20 @@ public class Collector {
 
     this.dataManager = new PostgresDataManager();
     this.dataManager.initialize(LOGGER, Environment.CONNECTION_URL);
+
+    this.userAgents = this.dataManager.getUserAgents().orElse(List.of());
   }
 
   public AbstractDataManager getDataManager() {
     return this.dataManager;
+  }
+
+  public SslBuilder getSslBuilder() {
+    return this.sslBuilder;
+  }
+
+  public List<UserAgent> getUserAgents() {
+    return this.userAgents;
   }
 
   private void setupConsole() {

@@ -31,8 +31,8 @@ public class CustomRssReader extends RssReader {
 
   public CustomRssReader(final SslBuilder sslBuilder, final List<UserAgent> userAgents, boolean tor) {
     this.sslBuilder = sslBuilder;
-    this.tor = tor;
     this.userAgents = userAgents;
+    this.tor = tor;
     this.httpClient = this.createHttpClient();
   }
 
