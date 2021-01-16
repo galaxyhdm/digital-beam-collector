@@ -1,26 +1,17 @@
 package dev.markusk.digitalbeam.collector.model;
 
-import java.util.Objects;
+import lombok.Data;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
+import java.util.UUID;
+
+@Data
 public class UserAgent implements Snowflake {
 
-  private final String snowflake;
-  private final String userAgent;
+  private UUID snowflake;
 
-  public UserAgent(final String snowflake, final String userAgent) {
-    Objects.requireNonNull(snowflake);
-    this.snowflake = snowflake;
-    this.userAgent = userAgent;
-  }
-
-  public String getUserAgent() {
-    return this.userAgent;
-  }
-
-  @Override
-  public String getSnowflakeId() {
-    return this.snowflake;
-  }
+  @BsonProperty(value = "user_agent")
+  private String userAgent;
 
   @Override
   public String toString() {

@@ -8,8 +8,6 @@ import dev.markusk.digitalbeam.collector.misc.CustomRssReader;
 import dev.markusk.digitalbeam.collector.model.Article;
 import dev.markusk.digitalbeam.collector.model.Target;
 import dev.markusk.digitalbeam.collector.model.Version;
-import dev.markusk.digitalbeam.collector.model.builder.ArticleBuilder;
-import dev.markusk.digitalbeam.collector.model.builder.VersionBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,24 +49,24 @@ public class RssFetcher implements AbstractFetcher {
   }
 
   private Article itemToArticle(final Item item, final Date fetchTime) {
-    final ArticleBuilder articleBuilder = new ArticleBuilder();
-    articleBuilder.setArticleId(""); // TODO: 28.12.20 create article id
-    articleBuilder.setTargetSnowflake(this.target.getSnowflakeId());
-    articleBuilder.setTitle(item.getTitle().orElse(""));
-    articleBuilder.setUrl(item.getLink().orElse(""));
-    articleBuilder.setReleaseTime(this.extractDate(item.getPubDate().orElse(null)));
-    articleBuilder.setFetchTime(fetchTime);
-    articleBuilder.setVersions(List.of(this.createFirstVersion(fetchTime)));
-    return articleBuilder.createArticle();
+    final Article article = new Article();
+    article.setArticleId(""); // TODO: 28.12.20 create article id
+    article.setTargetSnowflake(this.target.getSnowflake());
+    article.setTitle(item.getTitle().orElse(""));
+    article.setUrl(item.getLink().orElse(""));
+    article.setReleaseTime(this.extractDate(item.getPubDate().orElse(null)));
+    article.setFetchTime(fetchTime);
+    article.setVersions(List.of(this.createFirstVersion(fetchTime)));
+    return article;
   }
 
   private Version createFirstVersion(final Date updateTime) {
-    final VersionBuilder versionBuilder = new VersionBuilder();
+    final Version version = new Version();
     //versionBuilder.setVersionId();
-    versionBuilder.setVersion(0);
-    versionBuilder.setUpdateTime(updateTime);
-    versionBuilder.setAutoOffset("0d");
-    return versionBuilder.createVersion();
+    version.setVersion(0);
+    version.setUpdateTime(updateTime);
+    version.setAutoOffset("0d");
+    return version;
   }
 
   /**

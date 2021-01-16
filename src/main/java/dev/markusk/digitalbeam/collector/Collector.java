@@ -1,16 +1,19 @@
 package dev.markusk.digitalbeam.collector;
 
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
 import dev.markusk.digitalbeam.collector.console.BetterSystemOut;
 import dev.markusk.digitalbeam.collector.console.ConsoleController;
-import dev.markusk.digitalbeam.collector.data.AbstractDataManager;
-import dev.markusk.digitalbeam.collector.data.PostgresDataManager;
 import dev.markusk.digitalbeam.collector.misc.SslBuilder;
 import dev.markusk.digitalbeam.collector.model.UserAgent;
+import dev.markusk.digitalbeam.collector.mongodb.MongoConnector;
 import joptsimple.OptionSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Collector {
 
@@ -19,7 +22,8 @@ public class Collector {
   private final OptionSet optionSet;
 
   private ConsoleController consoleController;
-  private AbstractDataManager dataManager;
+  private MongoConnector mongoConnector;
+
   private SslBuilder sslBuilder;
   private List<UserAgent> userAgents;
 
@@ -40,14 +44,13 @@ public class Collector {
 
     this.sslBuilder = new SslBuilder();
 
-    this.dataManager = new PostgresDataManager();
-    this.dataManager.initialize(LOGGER, Environment.CONNECTION_URL);
+    this.mongoConnector = new MongoConnector(Environment.CONNECTION_URL);
+    this.mongoConnector.connect();
 
-    this.userAgents = this.dataManager.getUserAgents().orElse(List.of());
-  }
-
-  public AbstractDataManager getDataManager() {
-    return this.dataManager;
+    this.userAgents = new ArrayList<>();
+    final MongoCollection<UserAgent> userAgents = this.mongoConnector.getCollection("user_agents", UserAgent.class);
+    final FindIterable<UserAgent> find = userAgents.find();
+    find.forEach((Consumer<? super UserAgent>) this.userAgents::add);
   }
 
   public SslBuilder getSslBuilder() {

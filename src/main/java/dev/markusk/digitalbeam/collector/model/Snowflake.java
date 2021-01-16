@@ -1,7 +1,11 @@
 package dev.markusk.digitalbeam.collector.model;
 
+import java.util.UUID;
+
 public interface Snowflake {
 
-  String getSnowflakeId();
+  UUID getSnowflake();
+
+  void setSnowflake(UUID snowflake);
 
 }
