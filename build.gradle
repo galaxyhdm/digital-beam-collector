@@ -42,6 +42,10 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.16'
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
 
+    //Cache2k
+    implementation "org.cache2k:cache2k-api:2.0.0.Final"
+    runtimeOnly "org.cache2k:cache2k-core:2.0.0.Final"
+
     /*Logging and console*/
     implementation 'net.sf.jopt-simple:jopt-simple:6.0-alpha-3'
     implementation 'org.jline:jline:3.18.0'

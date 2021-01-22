@@ -1,19 +1,15 @@
 package dev.markusk.digitalbeam.collector;
 
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
 import dev.markusk.digitalbeam.collector.console.BetterSystemOut;
 import dev.markusk.digitalbeam.collector.console.ConsoleController;
+import dev.markusk.digitalbeam.collector.data.AbstractDataManager;
+import dev.markusk.digitalbeam.collector.data.DataCache;
+import dev.markusk.digitalbeam.collector.data.MongoDataManager;
 import dev.markusk.digitalbeam.collector.misc.SslBuilder;
-import dev.markusk.digitalbeam.collector.model.UserAgent;
 import dev.markusk.digitalbeam.collector.mongodb.MongoConnector;
 import joptsimple.OptionSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 
 public class Collector {
 
@@ -22,10 +18,11 @@ public class Collector {
   private final OptionSet optionSet;
 
   private ConsoleController consoleController;
+  private AbstractDataManager persistentDataManager;
+  private AbstractDataManager dataManager;
   private MongoConnector mongoConnector;
 
   private SslBuilder sslBuilder;
-  private List<UserAgent> userAgents;
 
   private boolean running;
 
@@ -44,21 +41,23 @@ public class Collector {
 
     this.sslBuilder = new SslBuilder();
 
-    this.mongoConnector = new MongoConnector(Environment.CONNECTION_URL);
-    this.mongoConnector.connect();
+    this.persistentDataManager = new MongoDataManager();
+    this.persistentDataManager.initialize();
 
-    this.userAgents = new ArrayList<>();
-    final MongoCollection<UserAgent> userAgents = this.mongoConnector.getCollection("user_agents", UserAgent.class);
-    final FindIterable<UserAgent> find = userAgents.find();
-    find.forEach((Consumer<? super UserAgent>) this.userAgents::add);
+    this.dataManager = new DataCache(this.persistentDataManager);
+    this.dataManager.initialize();
   }
 
   public SslBuilder getSslBuilder() {
     return this.sslBuilder;
   }
 
-  public List<UserAgent> getUserAgents() {
-    return this.userAgents;
+  public AbstractDataManager getDataManager() {
+    return this.dataManager;
+  }
+
+  public AbstractDataManager getPersistentDataManager() {
+    return this.persistentDataManager;
   }
 
   private void setupConsole() {

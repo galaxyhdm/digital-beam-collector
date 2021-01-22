@@ -1,6 +1,7 @@
 package dev.markusk.digitalbeam.collector.model;
 
 import lombok.Data;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import java.util.Date;
 import java.util.UUID;
@@ -8,19 +9,21 @@ import java.util.UUID;
 @Data
 public class Version implements Snowflake {
 
+  @BsonProperty(value = "version_snowflake")
   private UUID snowflake;
-  private String articleSnowflake;
-  private String versionId;
+
   private int version;
+
+  @BsonProperty(value = "update_time")
   private Date updateTime;
+
+  @BsonProperty(value = "auto_offset")
   private String autoOffset;
 
   @Override
   public String toString() {
     return "Version{" +
         "snowflake='" + snowflake + '\'' +
-        ", articleSnowflake='" + articleSnowflake + '\'' +
-        ", versionId='" + versionId + '\'' +
         ", version=" + version +
         ", updateTime=" + updateTime +
         ", autoOffset='" + autoOffset + '\'' +

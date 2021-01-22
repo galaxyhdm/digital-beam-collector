@@ -40,8 +40,8 @@ public class MongoConnector {
     this.connectionUrl = connectionUrl;
   }
 
-  public void connect() {
-    if (this.isConnected()) return;
+  public boolean connect() {
+    if (this.isConnected()) return true;
     this.setupMongodbLogger();
 
     final CodecRegistry pojoCodecRegistry = this.getPojoCodecRegistry();
@@ -54,7 +54,8 @@ public class MongoConnector {
     LOGGER.info(String.format("Connecting to mongodb... (%s)", this.getHostString(settings.getClusterSettings())));
     this.mongoClient = MongoClients.create(settings);
     this.mongoDatabase = this.mongoClient.getDatabase(
-        Objects.requireNonNullElse(mongoClientURI.getDatabase(), "local"));
+        Objects.requireNonNullElse(mongoClientURI.getDatabase(), "public"));
+    return this.isConnected();
   }
 
   @NotNull
