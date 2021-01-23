@@ -29,8 +29,6 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/org.influxdb/influxdb-java
     implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.21'
-    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.27'
     //Sentry
     implementation 'io.sentry:sentry-log4j2:3.2.0'
     // https://github.com/w3stling/rssreader
