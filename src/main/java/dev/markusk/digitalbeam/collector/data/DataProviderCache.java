@@ -17,21 +17,21 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class DataCache implements AbstractDataManager {
+public class DataProviderCache implements DataProvider {
 
   /* Constants */
   private static final Logger LOGGER = LogManager.getLogger();
 
-  /* PersistentDataManager */
-  private final AbstractDataManager persistentDataManager;
+  /* PersistentDataProvider */
+  private final DataProvider persistentDataProvider;
 
   /* Cache */
   private Cache<UUID, Optional<Article>> articleCache;
   private Cache<UUID, Optional<Target>> targetCache;
   private List<UserAgent> userAgents;
 
-  public DataCache(final AbstractDataManager persistentDataManager) {
-    this.persistentDataManager = persistentDataManager;
+  public DataProviderCache(final DataProvider persistentDataProvider) {
+    this.persistentDataProvider = persistentDataProvider;
   }
 
   @Override
@@ -44,8 +44,8 @@ public class DataCache implements AbstractDataManager {
     /* Cache */
     LOGGER.debug("Creating caches...");
     this.userAgents = new ArrayList<>();
-    this.articleCache = this.createArticleCache(new ArticleCacheLoader(this.persistentDataManager));
-    this.targetCache = this.createTargetCache(new TargetCacheLoader(this.persistentDataManager));
+    this.articleCache = this.createArticleCache(new ArticleCacheLoader(this.persistentDataProvider));
+    this.targetCache = this.createTargetCache(new TargetCacheLoader(this.persistentDataProvider));
 
     /* Pre-Filling */
     LOGGER.debug("Filling caches...");
@@ -60,12 +60,12 @@ public class DataCache implements AbstractDataManager {
 
   @Override
   public void updateArticle(final Article article) {
-    this.persistentDataManager.updateArticle(article);
+    this.persistentDataProvider.updateArticle(article);
   }
 
   @Override
   public Optional<List<Target>> getTargets() {
-    return this.persistentDataManager.getTargets();
+    return this.persistentDataProvider.getTargets();
   }
 
   @Override
@@ -75,7 +75,7 @@ public class DataCache implements AbstractDataManager {
 
   @Override
   public void updateLastUrl(final Target target) {
-    this.persistentDataManager.updateLastUrl(target);
+    this.persistentDataProvider.updateLastUrl(target);
   }
 
   @Override
@@ -111,7 +111,7 @@ public class DataCache implements AbstractDataManager {
   }
 
   private void loadUserAgents() {
-    final Optional<List<UserAgent>> userAgents = this.persistentDataManager.getUserAgents();
+    final Optional<List<UserAgent>> userAgents = this.persistentDataProvider.getUserAgents();
     if (userAgents.isEmpty()) return;
     this.userAgents.addAll(userAgents.get());
   }

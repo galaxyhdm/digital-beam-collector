@@ -3,7 +3,6 @@ package dev.markusk.digitalbeam.collector.fetcher;
 import com.apptastic.rssreader.Item;
 import com.apptastic.rssreader.RssReader;
 import dev.markusk.digitalbeam.collector.Collector;
-import dev.markusk.digitalbeam.collector.interfaces.AbstractFetcher;
 import dev.markusk.digitalbeam.collector.misc.CustomRssReader;
 import dev.markusk.digitalbeam.collector.model.Article;
 import dev.markusk.digitalbeam.collector.model.Target;
@@ -29,7 +28,7 @@ public class RssFetcher implements AbstractFetcher {
   public void initialize(final Collector collector, final Target target) {
     this.collector = collector;
     this.target = target;
-    this.rssReader = new CustomRssReader(collector.getSslBuilder(), collector.getDataManager().getUserAgents().get(),
+    this.rssReader = new CustomRssReader(collector.getSslBuilder(), collector.getDataProvider().getUserAgents().get(),
         target.isTor());
     this.simpleDateFormat = new SimpleDateFormat(target.getDatePattern(), Locale.US);
     this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

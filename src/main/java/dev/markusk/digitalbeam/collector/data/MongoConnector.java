@@ -1,4 +1,4 @@
-package dev.markusk.digitalbeam.collector.mongodb;
+package dev.markusk.digitalbeam.collector.data;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;

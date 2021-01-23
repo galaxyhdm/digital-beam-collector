@@ -2,11 +2,11 @@ package dev.markusk.digitalbeam.collector;
 
 import dev.markusk.digitalbeam.collector.console.BetterSystemOut;
 import dev.markusk.digitalbeam.collector.console.ConsoleController;
-import dev.markusk.digitalbeam.collector.data.AbstractDataManager;
-import dev.markusk.digitalbeam.collector.data.DataCache;
-import dev.markusk.digitalbeam.collector.data.MongoDataManager;
+import dev.markusk.digitalbeam.collector.data.DataProvider;
+import dev.markusk.digitalbeam.collector.data.DataProviderCache;
+import dev.markusk.digitalbeam.collector.data.MongoConnector;
+import dev.markusk.digitalbeam.collector.data.MongoDataProvider;
 import dev.markusk.digitalbeam.collector.misc.SslBuilder;
-import dev.markusk.digitalbeam.collector.mongodb.MongoConnector;
 import joptsimple.OptionSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,8 +18,8 @@ public class Collector {
   private final OptionSet optionSet;
 
   private ConsoleController consoleController;
-  private AbstractDataManager persistentDataManager;
-  private AbstractDataManager dataManager;
+  private DataProvider persistentDataProvider;
+  private DataProvider dataProvider;
   private MongoConnector mongoConnector;
 
   private SslBuilder sslBuilder;
@@ -41,23 +41,23 @@ public class Collector {
 
     this.sslBuilder = new SslBuilder();
 
-    this.persistentDataManager = new MongoDataManager();
-    this.persistentDataManager.initialize();
+    this.persistentDataProvider = new MongoDataProvider();
+    this.persistentDataProvider.initialize();
 
-    this.dataManager = new DataCache(this.persistentDataManager);
-    this.dataManager.initialize();
+    this.dataProvider = new DataProviderCache(this.persistentDataProvider);
+    this.dataProvider.initialize();
   }
 
   public SslBuilder getSslBuilder() {
     return this.sslBuilder;
   }
 
-  public AbstractDataManager getDataManager() {
-    return this.dataManager;
+  public DataProvider getDataProvider() {
+    return this.dataProvider;
   }
 
-  public AbstractDataManager getPersistentDataManager() {
-    return this.persistentDataManager;
+  public DataProvider getPersistentDataProvider() {
+    return this.persistentDataProvider;
   }
 
   private void setupConsole() {

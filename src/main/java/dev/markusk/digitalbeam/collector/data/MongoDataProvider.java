@@ -1,6 +1,7 @@
 package dev.markusk.digitalbeam.collector.data;
 
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -9,9 +10,9 @@ import dev.markusk.digitalbeam.collector.Environment;
 import dev.markusk.digitalbeam.collector.model.Article;
 import dev.markusk.digitalbeam.collector.model.Target;
 import dev.markusk.digitalbeam.collector.model.UserAgent;
-import dev.markusk.digitalbeam.collector.mongodb.MongoConnector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class MongoDataManager implements AbstractDataManager {
+public class MongoDataProvider implements DataProvider {
 
   /* Constants */
   private static final Logger LOGGER = LogManager.getLogger();
@@ -58,6 +59,12 @@ public class MongoDataManager implements AbstractDataManager {
 
     /* Create indexes */
     LOGGER.debug("Creating indexes...");
+
+    final ListIndexesIterable<Document> documents = this.articleCollection.listIndexes();
+    documents.forEach((Consumer<? super Document>) document -> {
+      System.out.println(document.getString("name"));
+    });
+
     final IndexOptions indexOptions = new IndexOptions().unique(true);
     this.articleCollection.createIndex(Indexes.ascending("snowflake"), indexOptions.name("snowflake_index"));
     this.targetCollection.createIndex(Indexes.ascending("snowflake"), indexOptions.name("snowflake_index"));
