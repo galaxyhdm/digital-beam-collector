@@ -1,9 +1,7 @@
 package dev.markusk.digitalbeam.collector.data;
 
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import dev.markusk.digitalbeam.collector.Environment;
@@ -12,7 +10,6 @@ import dev.markusk.digitalbeam.collector.model.Target;
 import dev.markusk.digitalbeam.collector.model.UserAgent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,29 +55,23 @@ public class MongoDataProvider implements DataProvider {
     this.userAgentCollection = this.mongoConnector.getCollection(USER_AGENT_COLLECTION_NAME, UserAgent.class);
 
     /* Create indexes */
-    LOGGER.debug("Creating indexes...");
+    this.mongoConnector.createIndex(this.articleCollection, "snowflake_index", Indexes.ascending("snowflake"), true);
+    this.mongoConnector.createIndex(this.targetCollection, "snowflake_index", Indexes.ascending("snowflake"), true);
+    this.mongoConnector.createIndex(this.userAgentCollection, "snowflake_index", Indexes.ascending("snowflake"), true);
 
-    final ListIndexesIterable<Document> documents = this.articleCollection.listIndexes();
-    documents.forEach((Consumer<? super Document>) document -> {
-      System.out.println(document.getString("name"));
-    });
-
-    final IndexOptions indexOptions = new IndexOptions().unique(true);
-    this.articleCollection.createIndex(Indexes.ascending("snowflake"), indexOptions.name("snowflake_index"));
-    this.targetCollection.createIndex(Indexes.ascending("snowflake"), indexOptions.name("snowflake_index"));
-    this.userAgentCollection.createIndex(Indexes.ascending("snowflake"), indexOptions.name("snowflake_index"));
-    LOGGER.debug("Indexes created");
     return this.mongoConnector.isConnected();
   }
 
   @Override
   public Optional<Article> getArticle(final UUID snowflake) {
+    if (snowflake == null) return Optional.empty();
     final FindIterable<Article> articleIterable = this.articleCollection.find(eq("snowflake", snowflake)).limit(1);
     return Optional.ofNullable(articleIterable.first());
   }
 
   @Override
   public void updateArticle(final Article article) {
+    if (article == null || article.getSnowflake() == null) return;
     if (this.articleCollection.replaceOne(eq("snowflake", article.getSnowflake()), article).getModifiedCount() == 0)
       this.articleCollection.insertOne(article);
   }
@@ -93,12 +84,14 @@ public class MongoDataProvider implements DataProvider {
 
   @Override
   public Optional<Target> getTarget(final UUID snowflake) {
+    if (snowflake == null) return Optional.empty();
     final FindIterable<Target> targetFindIterable = this.targetCollection.find(eq("snowflake", snowflake)).limit(1);
     return Optional.ofNullable(targetFindIterable.first());
   }
 
   @Override
   public void updateLastUrl(final Target target) {
+    if (target == null || target.getSnowflake() == null) return;
     this.targetCollection
         .updateOne(eq("snowflake", target.getSnowflake()), Updates.set("last_url", target.getLastUrl()));
   }

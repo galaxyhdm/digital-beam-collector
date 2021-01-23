@@ -55,11 +55,13 @@ public class DataProviderCache implements DataProvider {
 
   @Override
   public Optional<Article> getArticle(final UUID snowflake) {
+    if (snowflake == null) return Optional.empty();
     return this.articleCache.get(snowflake);
   }
 
   @Override
   public void updateArticle(final Article article) {
+    if (article == null || article.getSnowflake() == null) return;
     this.persistentDataProvider.updateArticle(article);
   }
 
@@ -70,11 +72,13 @@ public class DataProviderCache implements DataProvider {
 
   @Override
   public Optional<Target> getTarget(final UUID snowflake) {
+    if (snowflake == null) return Optional.empty();
     return this.targetCache.get(snowflake);
   }
 
   @Override
   public void updateLastUrl(final Target target) {
+    if(target == null || target.getSnowflake() == null) return;
     this.persistentDataProvider.updateLastUrl(target);
   }
 

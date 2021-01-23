@@ -4,7 +4,6 @@ import dev.markusk.digitalbeam.collector.console.BetterSystemOut;
 import dev.markusk.digitalbeam.collector.console.ConsoleController;
 import dev.markusk.digitalbeam.collector.data.DataProvider;
 import dev.markusk.digitalbeam.collector.data.DataProviderCache;
-import dev.markusk.digitalbeam.collector.data.MongoConnector;
 import dev.markusk.digitalbeam.collector.data.MongoDataProvider;
 import dev.markusk.digitalbeam.collector.misc.SslBuilder;
 import joptsimple.OptionSet;
@@ -20,7 +19,6 @@ public class Collector {
   private ConsoleController consoleController;
   private DataProvider persistentDataProvider;
   private DataProvider dataProvider;
-  private MongoConnector mongoConnector;
 
   private SslBuilder sslBuilder;
 

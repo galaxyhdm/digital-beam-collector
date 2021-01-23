@@ -4,23 +4,24 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoClientURI;
 import com.mongodb.ServerAddress;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.connection.ClusterSettings;
 import dev.markusk.digitalbeam.collector.Environment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.Document;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
+import java.util.stream.StreamSupport;
 
 public class MongoConnector {
 
@@ -88,6 +89,20 @@ public class MongoConnector {
   public <TDocument> MongoCollection<TDocument> getCollection(String collectionName, Class<TDocument> documentClass) {
     Objects.requireNonNull(this.mongoDatabase);
     return this.mongoDatabase.getCollection(collectionName, documentClass);
+  }
+
+  public <T> void createIndex(MongoCollection<T> collection, String name, Bson keys, boolean unique) {
+    Objects.requireNonNull(collection);
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(keys);
+    final ListIndexesIterable<Document> indexes = collection.listIndexes();
+    final boolean hasIndex = StreamSupport.stream(indexes.spliterator(), false)
+        .anyMatch(document -> document.getString("name").equals(name));
+    if (hasIndex) return;
+    final String collectionName = collection.getNamespace().getCollectionName();
+    LOGGER.debug(String.format("Creating index '%s' for collection '%s'...", name, collectionName));
+    final IndexOptions indexOptions = new IndexOptions().unique(unique).name(name);
+    collection.createIndex(keys, indexOptions);
   }
 
   public boolean isConnected() {
