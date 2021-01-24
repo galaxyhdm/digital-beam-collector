@@ -10,6 +10,7 @@ import java.util.UUID;
 @Data
 public class Article implements Snowflake {
 
+  @BsonProperty
   private UUID snowflake;
 
   @BsonProperty(value = "article_id")
@@ -18,7 +19,10 @@ public class Article implements Snowflake {
   @BsonProperty(value = "target_snowflake")
   private UUID targetSnowflake;
 
+  @BsonProperty
   private String title;
+
+  @BsonProperty
   private String url;
 
   @BsonProperty(value = "release_time")
@@ -27,6 +31,7 @@ public class Article implements Snowflake {
   @BsonProperty(value = "fetch_time")
   private Date fetchTime;
 
+  @BsonProperty
   private List<Version> versions;
 
   @Override

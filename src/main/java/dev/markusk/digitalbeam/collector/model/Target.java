@@ -8,9 +8,16 @@ import java.util.UUID;
 @Data
 public class Target implements Snowflake {
 
+  @BsonProperty
   private UUID snowflake;
+
+  @BsonProperty
   private String name;
+
+  @BsonProperty
   private String shortname;
+
+  @BsonProperty
   private boolean tor;
 
   @BsonProperty(value = "fetch_url")
@@ -25,6 +32,10 @@ public class Target implements Snowflake {
   @BsonProperty(value = "last_url")
   private String lastUrl;
 
+  @BsonProperty(value = "fetcher_class_path")
+  private String fetcherClassPath;
+
+  @BsonProperty
   private boolean active;
 
   @Override

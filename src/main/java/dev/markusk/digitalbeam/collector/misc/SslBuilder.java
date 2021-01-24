@@ -35,7 +35,7 @@ public class SslBuilder {
       final KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
       final CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
       final Certificate certificate;
-      LOGGER.debug("Loading letsencrypt certificate...");
+      LOGGER.debug("Loading certificate...");
       try (final InputStream stream = new URL(Environment.CERT_URL).openStream()) {
         certificate = certificateFactory.generateCertificate(stream);
       }

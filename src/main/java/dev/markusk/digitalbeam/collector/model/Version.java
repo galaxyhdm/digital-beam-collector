@@ -12,6 +12,7 @@ public class Version implements Snowflake {
   @BsonProperty(value = "version_snowflake")
   private UUID snowflake;
 
+  @BsonProperty
   private int version;
 
   @BsonProperty(value = "update_time")

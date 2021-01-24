@@ -71,6 +71,11 @@ public class DataProviderCache implements DataProvider {
   }
 
   @Override
+  public Optional<List<Target>> getActiveTargets() {
+    return this.persistentDataProvider.getActiveTargets();
+  }
+
+  @Override
   public Optional<Target> getTarget(final UUID snowflake) {
     if (snowflake == null) return Optional.empty();
     return this.targetCache.get(snowflake);

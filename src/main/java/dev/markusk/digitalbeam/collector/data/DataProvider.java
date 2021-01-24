@@ -20,6 +20,8 @@ public interface DataProvider {
 
   Optional<List<Target>> getTargets();
 
+  Optional<List<Target>> getActiveTargets();
+
   Optional<Target> getTarget(UUID snowflake);
 
   void updateLastUrl(Target target);

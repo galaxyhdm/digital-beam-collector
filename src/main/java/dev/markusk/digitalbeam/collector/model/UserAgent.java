@@ -8,6 +8,7 @@ import java.util.UUID;
 @Data
 public class UserAgent implements Snowflake {
 
+  @BsonProperty
   private UUID snowflake;
 
   @BsonProperty(value = "user_agent")

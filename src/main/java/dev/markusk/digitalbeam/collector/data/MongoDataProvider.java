@@ -83,6 +83,12 @@ public class MongoDataProvider implements DataProvider {
   }
 
   @Override
+  public Optional<List<Target>> getActiveTargets() {
+    final FindIterable<Target> targetFindIterable = this.targetCollection.find(eq("active", true));
+    return Optional.of(StreamSupport.stream(targetFindIterable.spliterator(), false).collect(Collectors.toList()));
+  }
+
+  @Override
   public Optional<Target> getTarget(final UUID snowflake) {
     if (snowflake == null) return Optional.empty();
     final FindIterable<Target> targetFindIterable = this.targetCollection.find(eq("snowflake", snowflake)).limit(1);

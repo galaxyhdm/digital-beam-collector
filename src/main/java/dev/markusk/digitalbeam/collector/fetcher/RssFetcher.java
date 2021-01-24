@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class RssFetcher implements AbstractFetcher {
+public class RssFetcher implements Fetcher {
 
   private static final Logger LOGGER = LogManager.getLogger(Collector.class);
 
@@ -28,7 +28,7 @@ public class RssFetcher implements AbstractFetcher {
   public void initialize(final Collector collector, final Target target) {
     this.collector = collector;
     this.target = target;
-    this.rssReader = new CustomRssReader(collector.getSslBuilder(), collector.getDataProvider().getUserAgents().get(),
+    this.rssReader = new CustomRssReader(collector.getSslBuilder(), collector.getDataProvider().getUserAgents().orElse(null),
         target.isTor());
     this.simpleDateFormat = new SimpleDateFormat(target.getDatePattern(), Locale.US);
     this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
