@@ -54,11 +54,6 @@ public class MongoDataProvider implements DataProvider {
     this.targetCollection = this.mongoConnector.getCollection(TARGET_COLLECTION_NAME, Target.class);
     this.userAgentCollection = this.mongoConnector.getCollection(USER_AGENT_COLLECTION_NAME, UserAgent.class);
 
-    /* Create indexes */
-    this.mongoConnector.createIndex(this.articleCollection, "snowflake_index", Indexes.ascending("snowflake"), true);
-    this.mongoConnector.createIndex(this.targetCollection, "snowflake_index", Indexes.ascending("snowflake"), true);
-    this.mongoConnector.createIndex(this.userAgentCollection, "snowflake_index", Indexes.ascending("snowflake"), true);
-
     return this.mongoConnector.isConnected();
   }
 
