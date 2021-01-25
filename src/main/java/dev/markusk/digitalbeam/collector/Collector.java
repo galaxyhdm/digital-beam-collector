@@ -5,6 +5,7 @@ import dev.markusk.digitalbeam.collector.console.ConsoleController;
 import dev.markusk.digitalbeam.collector.data.DataProvider;
 import dev.markusk.digitalbeam.collector.data.DataProviderCache;
 import dev.markusk.digitalbeam.collector.data.MongoDataProvider;
+import dev.markusk.digitalbeam.collector.fetcher.FetcherController;
 import dev.markusk.digitalbeam.collector.fetcher.FetcherRegistry;
 import dev.markusk.digitalbeam.collector.misc.SslBuilder;
 import joptsimple.OptionSet;
@@ -22,6 +23,7 @@ public class Collector {
   private DataProvider dataProvider;
 
   private FetcherRegistry fetcherRegistry;
+  private FetcherController fetcherController;
 
   private SslBuilder sslBuilder;
 
@@ -50,6 +52,9 @@ public class Collector {
 
     this.fetcherRegistry = new FetcherRegistry(this);
     this.fetcherRegistry.registerFetchers();
+
+    this.fetcherController = new FetcherController(this, this.fetcherRegistry);
+    this.fetcherController.initializeJobs();
   }
 
   public SslBuilder getSslBuilder() {
