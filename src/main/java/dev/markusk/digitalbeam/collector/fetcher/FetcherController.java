@@ -35,7 +35,8 @@ public class FetcherController {
   }
 
   private void cancelJobs() {
-    this.timer.cancel();
+    this.jobs.forEach((target, collectJob) -> collectJob.cancel());
+    this.timer.purge();
   }
 
 }
