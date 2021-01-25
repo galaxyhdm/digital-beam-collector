@@ -28,8 +28,10 @@ public class RssFetcher implements Fetcher {
   public void initialize(final Collector collector, final Target target) {
     this.collector = collector;
     this.target = target;
-    this.rssReader = new CustomRssReader(collector.getSslBuilder(), collector.getDataProvider().getUserAgents().orElse(null),
-        target.isTor());
+    this.rssReader =
+        new CustomRssReader(collector.getSslBuilder(),
+            collector.getDataProvider().getUserAgents().orElse(null),
+            target.isTor());
     this.simpleDateFormat = new SimpleDateFormat(target.getDatePattern(), Locale.US);
     this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
   }

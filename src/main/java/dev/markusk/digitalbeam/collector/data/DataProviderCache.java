@@ -55,13 +55,13 @@ public class DataProviderCache implements DataProvider {
 
   @Override
   public Optional<Article> getArticle(final UUID snowflake) {
-    if (snowflake == null) return Optional.empty();
+    if (snowflake == null) throw new NullPointerException("Id ist null");
     return this.articleCache.get(snowflake);
   }
 
   @Override
   public void updateArticle(final Article article) {
-    if (article == null || article.getSnowflake() == null) return;
+    if (article == null || article.getSnowflake() == null) throw new NullPointerException("Article ist null");
     this.persistentDataProvider.updateArticle(article);
   }
 
@@ -77,13 +77,13 @@ public class DataProviderCache implements DataProvider {
 
   @Override
   public Optional<Target> getTarget(final UUID snowflake) {
-    if (snowflake == null) return Optional.empty();
+    if (snowflake == null) throw new NullPointerException("Id ist null");
     return this.targetCache.get(snowflake);
   }
 
   @Override
   public void updateLastUrl(final Target target) {
-    if(target == null || target.getSnowflake() == null) return;
+    if (target == null || target.getSnowflake() == null) throw new NullPointerException("Target ist null");
     this.persistentDataProvider.updateLastUrl(target);
   }
 

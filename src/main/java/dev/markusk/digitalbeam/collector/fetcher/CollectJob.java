@@ -10,7 +10,6 @@ public class CollectJob extends TimerTask {
   private static final Logger LOGGER = LogManager.getLogger();
 
 
-
   @Override
   public void run() {
 
