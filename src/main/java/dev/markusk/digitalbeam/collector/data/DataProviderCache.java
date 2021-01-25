@@ -7,6 +7,7 @@ import dev.markusk.digitalbeam.collector.model.Target;
 import dev.markusk.digitalbeam.collector.model.UserAgent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
 import org.cache2k.io.AsyncCacheLoader;
@@ -14,7 +15,6 @@ import org.cache2k.io.AsyncCacheLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class DataProviderCache implements DataProvider {
@@ -26,8 +26,8 @@ public class DataProviderCache implements DataProvider {
   private final DataProvider persistentDataProvider;
 
   /* Cache */
-  private Cache<UUID, Optional<Article>> articleCache;
-  private Cache<UUID, Optional<Target>> targetCache;
+  private Cache<ObjectId, Optional<Article>> articleCache;
+  private Cache<ObjectId, Optional<Target>> targetCache;
   private List<UserAgent> userAgents;
 
   public DataProviderCache(final DataProvider persistentDataProvider) {
@@ -54,14 +54,14 @@ public class DataProviderCache implements DataProvider {
   }
 
   @Override
-  public Optional<Article> getArticle(final UUID snowflake) {
-    if (snowflake == null) throw new NullPointerException("Id ist null");
-    return this.articleCache.get(snowflake);
+  public Optional<Article> getArticle(final ObjectId objectId) {
+    if (objectId == null) throw new NullPointerException("Id ist null");
+    return this.articleCache.get(objectId);
   }
 
   @Override
   public void updateArticle(final Article article) {
-    if (article == null || article.getSnowflake() == null) throw new NullPointerException("Article ist null");
+    if (article == null || article.getObjectId() == null) throw new NullPointerException("Article ist null");
     this.persistentDataProvider.updateArticle(article);
   }
 
@@ -76,14 +76,14 @@ public class DataProviderCache implements DataProvider {
   }
 
   @Override
-  public Optional<Target> getTarget(final UUID snowflake) {
-    if (snowflake == null) throw new NullPointerException("Id ist null");
-    return this.targetCache.get(snowflake);
+  public Optional<Target> getTarget(final ObjectId objectId) {
+    if (objectId == null) throw new NullPointerException("Id ist null");
+    return this.targetCache.get(objectId);
   }
 
   @Override
   public void updateLastUrl(final Target target) {
-    if (target == null || target.getSnowflake() == null) throw new NullPointerException("Target ist null");
+    if (target == null || target.getObjectId() == null) throw new NullPointerException("Target ist null");
     this.persistentDataProvider.updateLastUrl(target);
   }
 
@@ -101,8 +101,9 @@ public class DataProviderCache implements DataProvider {
     this.userAgents = null;
   }
 
-  private Cache<UUID, Optional<Article>> createArticleCache(AsyncCacheLoader<UUID, Optional<Article>> cacheLoader) {
-    return new Cache2kBuilder<UUID, Optional<Article>>() {
+  private Cache<ObjectId, Optional<Article>> createArticleCache(
+      AsyncCacheLoader<ObjectId, Optional<Article>> cacheLoader) {
+    return new Cache2kBuilder<ObjectId, Optional<Article>>() {
     }
         .expireAfterWrite(5, TimeUnit.MINUTES)
         .refreshAhead(true)
@@ -110,8 +111,9 @@ public class DataProviderCache implements DataProvider {
         .build();
   }
 
-  private Cache<UUID, Optional<Target>> createTargetCache(AsyncCacheLoader<UUID, Optional<Target>> cacheLoader) {
-    return new Cache2kBuilder<UUID, Optional<Target>>() {
+  private Cache<ObjectId, Optional<Target>> createTargetCache(
+      AsyncCacheLoader<ObjectId, Optional<Target>> cacheLoader) {
+    return new Cache2kBuilder<ObjectId, Optional<Target>>() {
     }
         .expireAfterWrite(15, TimeUnit.MINUTES)
         .refreshAhead(true)

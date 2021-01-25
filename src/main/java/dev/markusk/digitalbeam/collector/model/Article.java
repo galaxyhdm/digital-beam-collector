@@ -2,22 +2,22 @@ package dev.markusk.digitalbeam.collector.model;
 
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Data
-public class Article implements Snowflake {
+public class Article {
 
-  @BsonProperty
-  private UUID snowflake;
+  @BsonProperty(value = "_id")
+  private ObjectId objectId;
 
   @BsonProperty(value = "article_id")
   private String articleId;
 
-  @BsonProperty(value = "target_snowflake")
-  private UUID targetSnowflake;
+  @BsonProperty(value = "target_id")
+  private ObjectId targetObjectId;
 
   @BsonProperty
   private String title;
@@ -37,9 +37,9 @@ public class Article implements Snowflake {
   @Override
   public String toString() {
     return "Article{" +
-        "snowflake='" + snowflake + '\'' +
+        "objectId='" + objectId + '\'' +
         ", articleId='" + articleId + '\'' +
-        ", targetSnowflake='" + targetSnowflake + '\'' +
+        ", targetObjectId='" + targetObjectId + '\'' +
         ", title='" + title + '\'' +
         ", url='" + url + '\'' +
         ", releaseTime=" + releaseTime +

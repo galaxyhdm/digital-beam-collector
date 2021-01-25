@@ -10,11 +10,11 @@ import dev.markusk.digitalbeam.collector.model.Target;
 import dev.markusk.digitalbeam.collector.model.UserAgent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -63,16 +63,16 @@ public class MongoDataProvider implements DataProvider {
   }
 
   @Override
-  public Optional<Article> getArticle(final UUID snowflake) {
-    if (snowflake == null) throw new NullPointerException("Id ist null");
-    final FindIterable<Article> articleIterable = this.articleCollection.find(eq("snowflake", snowflake)).limit(1);
+  public Optional<Article> getArticle(final ObjectId objectId) {
+    if (objectId == null) throw new NullPointerException("Id ist null");
+    final FindIterable<Article> articleIterable = this.articleCollection.find(eq(objectId)).limit(1);
     return Optional.ofNullable(articleIterable.first());
   }
 
   @Override
   public void updateArticle(final Article article) {
-    if (article == null || article.getSnowflake() == null) throw new NullPointerException("Article ist null");
-    if (this.articleCollection.replaceOne(eq("snowflake", article.getSnowflake()), article).getModifiedCount() == 0)
+    if (article == null || article.getObjectId() == null) throw new NullPointerException("Article ist null");
+    if (this.articleCollection.replaceOne(eq(article.getObjectId()), article).getModifiedCount() == 0)
       this.articleCollection.insertOne(article);
   }
 
@@ -89,17 +89,17 @@ public class MongoDataProvider implements DataProvider {
   }
 
   @Override
-  public Optional<Target> getTarget(final UUID snowflake) {
-    if (snowflake == null) throw new NullPointerException("Id ist null");
-    final FindIterable<Target> targetFindIterable = this.targetCollection.find(eq("snowflake", snowflake)).limit(1);
+  public Optional<Target> getTarget(final ObjectId objectId) {
+    if (objectId == null) throw new NullPointerException("Id ist null");
+    final FindIterable<Target> targetFindIterable = this.targetCollection.find(eq(objectId)).limit(1);
     return Optional.ofNullable(targetFindIterable.first());
   }
 
   @Override
   public void updateLastUrl(final Target target) {
-    if (target == null || target.getSnowflake() == null) throw new NullPointerException("Target ist null");
+    if (target == null || target.getObjectId() == null) throw new NullPointerException("Target ist null");
     this.targetCollection
-        .updateOne(eq("snowflake", target.getSnowflake()), Updates.set("last_url", target.getLastUrl()));
+        .updateOne(eq(target.getObjectId()), Updates.set("last_url", target.getLastUrl()));
   }
 
   @Override

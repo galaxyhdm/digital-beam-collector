@@ -2,15 +2,15 @@ package dev.markusk.digitalbeam.collector.model;
 
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Data
-public class Version implements Snowflake {
+public class Version {
 
-  @BsonProperty(value = "version_snowflake")
-  private UUID snowflake;
+  @BsonProperty(value = "version_id")
+  private ObjectId objectId;
 
   @BsonProperty
   private int version;
@@ -24,7 +24,7 @@ public class Version implements Snowflake {
   @Override
   public String toString() {
     return "Version{" +
-        "snowflake='" + snowflake + '\'' +
+        "objectId='" + objectId + '\'' +
         ", version=" + version +
         ", updateTime=" + updateTime +
         ", autoOffset='" + autoOffset + '\'' +

@@ -53,7 +53,7 @@ public class RssFetcher implements Fetcher {
   private Article itemToArticle(final Item item, final Date fetchTime) {
     final Article article = new Article();
     article.setArticleId(""); // TODO: 28.12.20 create article id
-    article.setTargetSnowflake(this.target.getSnowflake());
+    article.setTargetObjectId(this.target.getObjectId());
     article.setTitle(item.getTitle().orElse(""));
     article.setUrl(item.getLink().orElse(""));
     article.setReleaseTime(this.extractDate(item.getPubDate().orElse(null)));

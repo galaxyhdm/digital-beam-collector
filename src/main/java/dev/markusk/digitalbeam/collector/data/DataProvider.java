@@ -3,10 +3,10 @@ package dev.markusk.digitalbeam.collector.data;
 import dev.markusk.digitalbeam.collector.model.Article;
 import dev.markusk.digitalbeam.collector.model.Target;
 import dev.markusk.digitalbeam.collector.model.UserAgent;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface DataProvider {
 
@@ -14,7 +14,7 @@ public interface DataProvider {
 
   boolean initialize(String connectionUrl);
 
-  Optional<Article> getArticle(UUID snowflake);
+  Optional<Article> getArticle(ObjectId objectId);
 
   void updateArticle(Article article);
 
@@ -22,7 +22,7 @@ public interface DataProvider {
 
   Optional<List<Target>> getActiveTargets();
 
-  Optional<Target> getTarget(UUID snowflake);
+  Optional<Target> getTarget(ObjectId objectId);
 
   void updateLastUrl(Target target);
 
