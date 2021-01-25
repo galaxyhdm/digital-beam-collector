@@ -14,6 +14,7 @@ import org.cache2k.io.AsyncCacheLoader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -55,13 +56,14 @@ public class DataProviderCache implements DataProvider {
 
   @Override
   public Optional<Article> getArticle(final ObjectId objectId) {
-    if (objectId == null) throw new NullPointerException("Id ist null");
+    Objects.requireNonNull(objectId, "ObjectId is null");
     return this.articleCache.get(objectId);
   }
 
   @Override
   public void updateArticle(final Article article) {
-    if (article == null || article.getObjectId() == null) throw new NullPointerException("Article ist null");
+    Objects.requireNonNull(article, "Article is null");
+    Objects.requireNonNull(article.getObjectId(), "ObjectId is null");
     this.persistentDataProvider.updateArticle(article);
   }
 
@@ -77,13 +79,14 @@ public class DataProviderCache implements DataProvider {
 
   @Override
   public Optional<Target> getTarget(final ObjectId objectId) {
-    if (objectId == null) throw new NullPointerException("Id ist null");
+    Objects.requireNonNull(objectId, "ObjectId is null");
     return this.targetCache.get(objectId);
   }
 
   @Override
   public void updateLastUrl(final Target target) {
-    if (target == null || target.getObjectId() == null) throw new NullPointerException("Target ist null");
+    Objects.requireNonNull(target, "Target is null");
+    Objects.requireNonNull(target.getObjectId(), "ObjectId is null");
     this.persistentDataProvider.updateLastUrl(target);
   }
 

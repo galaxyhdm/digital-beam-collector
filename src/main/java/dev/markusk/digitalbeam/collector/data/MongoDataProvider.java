@@ -2,7 +2,6 @@ package dev.markusk.digitalbeam.collector.data;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import dev.markusk.digitalbeam.collector.Environment;
 import dev.markusk.digitalbeam.collector.model.Article;
@@ -14,6 +13,7 @@ import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -59,14 +59,15 @@ public class MongoDataProvider implements DataProvider {
 
   @Override
   public Optional<Article> getArticle(final ObjectId objectId) {
-    if (objectId == null) throw new NullPointerException("Id ist null");
+    Objects.requireNonNull(objectId, "ObjectId is null");
     final FindIterable<Article> articleIterable = this.articleCollection.find(eq(objectId)).limit(1);
     return Optional.ofNullable(articleIterable.first());
   }
 
   @Override
   public void updateArticle(final Article article) {
-    if (article == null || article.getObjectId() == null) throw new NullPointerException("Article ist null");
+    Objects.requireNonNull(article, "Article is null");
+    Objects.requireNonNull(article.getObjectId(), "ObjectId is null");
     if (this.articleCollection.replaceOne(eq(article.getObjectId()), article).getModifiedCount() == 0)
       this.articleCollection.insertOne(article);
   }
@@ -85,14 +86,15 @@ public class MongoDataProvider implements DataProvider {
 
   @Override
   public Optional<Target> getTarget(final ObjectId objectId) {
-    if (objectId == null) throw new NullPointerException("Id ist null");
+    Objects.requireNonNull(objectId, "ObjectId is null");
     final FindIterable<Target> targetFindIterable = this.targetCollection.find(eq(objectId)).limit(1);
     return Optional.ofNullable(targetFindIterable.first());
   }
 
   @Override
   public void updateLastUrl(final Target target) {
-    if (target == null || target.getObjectId() == null) throw new NullPointerException("Target ist null");
+    Objects.requireNonNull(target, "Target is null");
+    Objects.requireNonNull(target.getObjectId(), "ObjectId is null");
     this.targetCollection
         .updateOne(eq(target.getObjectId()), Updates.set("last_url", target.getLastUrl()));
   }
