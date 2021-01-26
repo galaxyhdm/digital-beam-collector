@@ -10,7 +10,9 @@ import org.apache.logging.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.cache2k.Cache;
 import org.cache2k.Cache2kBuilder;
+import org.cache2k.CacheEntry;
 import org.cache2k.io.AsyncCacheLoader;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +63,28 @@ public class DataProviderCache implements DataProvider {
   }
 
   @Override
+  public Optional<Article> getArticleById(final String articleId) {
+    Objects.requireNonNull(articleId, "ArticleId is null");
+    final Optional<Article> cachedArticle = this.getCachedArticle(articleId);
+    return cachedArticle.or(() -> {
+      final Optional<Article> articleById = this.persistentDataProvider.getArticleById(articleId);
+      articleById.ifPresent(article -> this.articleCache.put(article.getObjectId(), articleById));
+      return articleById;
+    });
+  }
+
+  @Override
   public void updateArticle(final Article article) {
     Objects.requireNonNull(article, "Article is null");
     Objects.requireNonNull(article.getObjectId(), "ObjectId is null");
+    this.articleCache.put(article.getObjectId(), Optional.of(article));
     this.persistentDataProvider.updateArticle(article);
+  }
+
+  @Override
+  public boolean hasArticle(final ObjectId objectId) {
+    Objects.requireNonNull(objectId, "ObjectId is null");
+    return this.articleCache.containsKey(objectId) || this.persistentDataProvider.hasArticle(objectId);
   }
 
   @Override
@@ -128,6 +148,16 @@ public class DataProviderCache implements DataProvider {
     final Optional<List<UserAgent>> userAgents = this.persistentDataProvider.getUserAgents();
     if (userAgents.isEmpty()) return;
     this.userAgents.addAll(userAgents.get());
+  }
+
+  @NotNull
+  private Optional<Article> getCachedArticle(final String articleId) {
+    return this.articleCache.entries().stream().filter(this::isPresent).map(CacheEntry::getValue).map(Optional::get)
+        .filter(article -> article.getArticleId().equals(articleId)).findFirst();
+  }
+
+  private boolean isPresent(final CacheEntry<ObjectId, Optional<Article>> objectIdOptionalCacheEntry) {
+    return objectIdOptionalCacheEntry.getValue().isPresent();
   }
 
 }

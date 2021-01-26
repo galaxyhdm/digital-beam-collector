@@ -35,6 +35,8 @@ dependencies {
     implementation 'com.apptastic:rssreader:2.3.1'
     // https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver
     implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.7'
+    // https://mvnrepository.com/artifact/commons-codec/commons-codec
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
 
     //Lombok
     implementation 'org.projectlombok:lombok:1.18.16'

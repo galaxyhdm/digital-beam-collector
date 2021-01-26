@@ -16,7 +16,11 @@ public interface DataProvider {
 
   Optional<Article> getArticle(ObjectId objectId);
 
+  Optional<Article> getArticleById(String articleId);
+
   void updateArticle(Article article);
+
+  boolean hasArticle(ObjectId objectId);
 
   Optional<List<Target>> getTargets();
 

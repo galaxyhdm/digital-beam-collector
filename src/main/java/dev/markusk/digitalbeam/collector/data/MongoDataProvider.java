@@ -2,6 +2,7 @@ package dev.markusk.digitalbeam.collector.data;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import dev.markusk.digitalbeam.collector.Environment;
 import dev.markusk.digitalbeam.collector.model.Article;
@@ -54,6 +55,9 @@ public class MongoDataProvider implements DataProvider {
     this.targetCollection = this.mongoConnector.getCollection(TARGET_COLLECTION_NAME, Target.class);
     this.userAgentCollection = this.mongoConnector.getCollection(USER_AGENT_COLLECTION_NAME, UserAgent.class);
 
+    /* Create indexes */
+    this.mongoConnector.createIndex(this.articleCollection, "article_id_index", Indexes.ascending("article_id"), true);
+
     return this.mongoConnector.isConnected();
   }
 
@@ -65,11 +69,24 @@ public class MongoDataProvider implements DataProvider {
   }
 
   @Override
+  public Optional<Article> getArticleById(final String articleId) {
+    Objects.requireNonNull(articleId, "ArticleId is null");
+    final FindIterable<Article> articleIterable = this.articleCollection.find(eq("article_id", articleId)).limit(1);
+    return Optional.ofNullable(articleIterable.first());
+  }
+
+  @Override
   public void updateArticle(final Article article) {
     Objects.requireNonNull(article, "Article is null");
     Objects.requireNonNull(article.getObjectId(), "ObjectId is null");
     if (this.articleCollection.replaceOne(eq(article.getObjectId()), article).getModifiedCount() == 0)
       this.articleCollection.insertOne(article);
+  }
+
+  @Override
+  public boolean hasArticle(final ObjectId objectId) {
+    Objects.requireNonNull(objectId, "ObjectId is null");
+    return this.articleCollection.countDocuments(eq(objectId)) == 1;
   }
 
   @Override

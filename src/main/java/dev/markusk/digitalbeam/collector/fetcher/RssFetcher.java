@@ -6,9 +6,10 @@ import dev.markusk.digitalbeam.collector.Collector;
 import dev.markusk.digitalbeam.collector.misc.CustomRssReader;
 import dev.markusk.digitalbeam.collector.model.Article;
 import dev.markusk.digitalbeam.collector.model.Target;
-import dev.markusk.digitalbeam.collector.model.Version;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.types.ObjectId;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,23 +53,16 @@ public class RssFetcher implements Fetcher {
 
   private Article itemToArticle(final Item item, final Date fetchTime) {
     final Article article = new Article();
-    article.setArticleId(""); // TODO: 28.12.20 create article id
+    article.setObjectId(new ObjectId());
+    article.setArticleId(
+        this.getArticleId(this.target, item.getLink().orElse("EMPTY")));
     article.setTargetObjectId(this.target.getObjectId());
     article.setTitle(item.getTitle().orElse(""));
     article.setUrl(item.getLink().orElse(""));
     article.setReleaseTime(this.extractDate(item.getPubDate().orElse(null)));
     article.setFetchTime(fetchTime);
-    article.setVersions(List.of(this.createFirstVersion(fetchTime)));
+    article.setVersions(List.of());
     return article;
-  }
-
-  private Version createFirstVersion(final Date updateTime) {
-    final Version version = new Version();
-    //versionBuilder.setVersionId();
-    version.setVersion(0);
-    version.setUpdateTime(updateTime);
-    version.setAutoOffset("0d");
-    return version;
   }
 
   /**
@@ -90,6 +84,10 @@ public class RssFetcher implements Fetcher {
       return null;
     }
     return parse;
+  }
+
+  public String getArticleId(final Target target, final String url) {
+    return target.getShortname() + "#" + DigestUtils.sha256Hex(url);
   }
 
 }
