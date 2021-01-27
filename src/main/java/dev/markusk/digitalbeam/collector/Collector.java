@@ -71,7 +71,7 @@ public class Collector {
 
   private void setupConsole() {
     this.consoleController =
-        new ConsoleController(VersionInfo.DEBUG || this.optionSet.has("debug") || Environment.DEBUG, false);
+        new ConsoleController(this.optionSet.has("debug") || Environment.DEBUG, false);
     this.consoleController.setupConsole();
     new BetterSystemOut(LOGGER).overwrite();
   }

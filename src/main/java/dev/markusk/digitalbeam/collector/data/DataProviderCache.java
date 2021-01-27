@@ -129,7 +129,6 @@ public class DataProviderCache implements DataProvider {
     return new Cache2kBuilder<ObjectId, Optional<Article>>() {
     }
         .expireAfterWrite(5, TimeUnit.MINUTES)
-        .refreshAhead(true)
         .loader(cacheLoader)
         .build();
   }
@@ -152,12 +151,8 @@ public class DataProviderCache implements DataProvider {
 
   @NotNull
   private Optional<Article> getCachedArticle(final String articleId) {
-    return this.articleCache.entries().stream().filter(this::isPresent).map(CacheEntry::getValue).map(Optional::get)
+    return this.articleCache.entries().stream().map(CacheEntry::getValue).filter(Optional::isPresent).map(Optional::get)
         .filter(article -> article.getArticleId().equals(articleId)).findFirst();
-  }
-
-  private boolean isPresent(final CacheEntry<ObjectId, Optional<Article>> objectIdOptionalCacheEntry) {
-    return objectIdOptionalCacheEntry.getValue().isPresent();
   }
 
 }

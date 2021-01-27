@@ -5,7 +5,7 @@ public class VersionInfo {
   public static final String VERSION;
   public static final String BUILD_DATE;
   public static final String BUILD_TIME;
-  public static final boolean DEBUG;
+  public static final boolean DEVELOPMENT_BUILD;
 
   private static final String VERSION_RAW = "@VERSION@";
   private static final String BUILD_DATE_RAW = "@DATE@";
@@ -19,7 +19,7 @@ public class VersionInfo {
     //noinspection ConstantConditions
     BUILD_TIME = BUILD_TIME_RAW.startsWith("@") ? "DEBUG_BUILD" : BUILD_TIME_RAW;
     //noinspection ConstantConditions
-    DEBUG = VERSION_RAW.startsWith("@") || VERSION_RAW.endsWith("-SNAPSHOT");
+    DEVELOPMENT_BUILD = VERSION_RAW.startsWith("@") || VERSION_RAW.endsWith("-SNAPSHOT");
   }
 
 }
