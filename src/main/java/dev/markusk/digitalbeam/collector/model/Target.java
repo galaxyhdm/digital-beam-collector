@@ -1,73 +1,54 @@
 package dev.markusk.digitalbeam.collector.model;
 
-import java.util.Objects;
+import lombok.Data;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
 
-public class Target implements Snowflake {
+@Data
+public class Target {
 
-  private final String snowflake;
-  private final String name;
-  private final String shortname;
-  private final String fetchUrl;
-  private final boolean tor;
-  private final int waitTime;
-  private final String datePattern;
-  private final boolean active;
+  @BsonProperty(value = "_id")
+  private ObjectId objectId;
 
-  public Target(final String snowflake, final String name, final String shortname, final String fetchUrl,
-      final boolean tor, final int waitTime, final String datePattern, final boolean active) {
-    this.datePattern = datePattern;
-    this.active = active;
-    Objects.requireNonNull(snowflake);
-    this.snowflake = snowflake;
-    this.name = name;
-    this.shortname = shortname;
-    this.fetchUrl = fetchUrl;
-    this.tor = tor;
-    this.waitTime = waitTime;
-  }
+  @BsonProperty
+  private String name;
 
-  public String getName() {
-    return this.name;
-  }
+  @BsonProperty
+  private String shortname;
 
-  public String getShortname() {
-    return this.shortname;
-  }
+  @BsonProperty
+  private boolean tor;
 
-  public String getFetchUrl() {
-    return this.fetchUrl;
-  }
+  @BsonProperty(value = "fetch_url")
+  private String fetchUrl;
 
-  public boolean isTor() {
-    return this.tor;
-  }
+  @BsonProperty(value = "wait_time")
+  private int waitTime;
 
-  public int getWaitTime() {
-    return this.waitTime;
-  }
+  @BsonProperty(value = "date_pattern")
+  private String datePattern;
 
-  public String getDatePattern() {
-    return this.datePattern;
-  }
+  @BsonProperty(value = "last_url")
+  private String lastUrl;
 
-  public boolean isActive() {
-    return this.active;
-  }
+  @BsonProperty(value = "fetcher_class_path")
+  private String fetcherClassPath;
 
-  @Override
-  public String getSnowflakeId() {
-    return this.snowflake;
-  }
+  @BsonProperty
+  private boolean active;
 
   @Override
   public String toString() {
     return "Target{" +
-        "snowflake='" + snowflake + '\'' +
+        "objectId=" + objectId +
         ", name='" + name + '\'' +
         ", shortname='" + shortname + '\'' +
         ", fetchUrl='" + fetchUrl + '\'' +
         ", tor=" + tor +
         ", waitTime=" + waitTime +
+        ", datePattern='" + datePattern + '\'' +
+        ", lastUrl='" + lastUrl + '\'' +
+        ", active=" + active +
         '}';
   }
 }

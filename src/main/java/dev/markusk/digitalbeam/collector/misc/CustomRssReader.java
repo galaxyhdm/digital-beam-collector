@@ -26,8 +26,7 @@ public class CustomRssReader extends RssReader {
   private final SslBuilder sslBuilder;
   private final boolean tor;
   private final List<UserAgent> userAgents;
-
-  private HttpClient httpClient;
+  private final HttpClient httpClient;
 
   public CustomRssReader(final SslBuilder sslBuilder, final List<UserAgent> userAgents, boolean tor) {
     this.sslBuilder = sslBuilder;
@@ -38,10 +37,12 @@ public class CustomRssReader extends RssReader {
 
   @Override
   protected CompletableFuture<HttpResponse<InputStream>> sendAsyncRequest(final String url) {
+    final String userAgent = this.getRandomUserAgent();
+    LOGGER.debug(String.format("New request for '%s' with user-agent: '%s'", url, userAgent));
     HttpRequest req = HttpRequest.newBuilder(URI.create(url))
         .timeout(Duration.ofSeconds(25))
         .header("Accept-Encoding", "gzip")
-        .header("User-Agent", this.getRandomUserAgent())
+        .header("User-Agent", userAgent)
         .GET()
         .build();
 

@@ -1,4 +1,4 @@
-package dev.markusk.digitalbeam.collector.interfaces;
+package dev.markusk.digitalbeam.collector.fetcher;
 
 import dev.markusk.digitalbeam.collector.Collector;
 import dev.markusk.digitalbeam.collector.model.Article;
@@ -7,7 +7,7 @@ import dev.markusk.digitalbeam.collector.model.Target;
 import java.util.Date;
 import java.util.List;
 
-public interface AbstractFetcher {
+public interface Fetcher {
 
   /**
    * @param collector the main {@link Collector} instance

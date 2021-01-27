@@ -4,6 +4,7 @@ import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
@@ -32,8 +33,8 @@ public class QueueLogAppender extends AbstractAppender {
   private final BlockingQueue<String> queue;
 
   public QueueLogAppender(final String name, final Filter filter, final Layout<? extends Serializable> layout,
-      final boolean ignoreExceptions, final BlockingQueue<String> queue) {
-    super(name, filter, layout, ignoreExceptions);
+      final boolean ignoreExceptions, final Property[] properties, final BlockingQueue<String> queue) {
+    super(name, filter, layout, ignoreExceptions, properties);
     this.queue = queue;
   }
 
@@ -60,7 +61,7 @@ public class QueueLogAppender extends AbstractAppender {
     if (layout == null) {
       layout = PatternLayout.newBuilder().build();
     }
-    return new QueueLogAppender(name, filter, layout, ignoreExceptions, queue);
+    return new QueueLogAppender(name, filter, layout, ignoreExceptions, Property.EMPTY_ARRAY, queue);
   }
 
   public static String getNextLogEvent(final String queueName) {

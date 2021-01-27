@@ -1,71 +1,45 @@
 package dev.markusk.digitalbeam.collector.model;
 
+import lombok.Data;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
+
 import java.util.Date;
 import java.util.List;
 
-public class Article implements Snowflake {
+@Data
+public class Article {
 
-  private final String snowflake;
-  private final String articleId;
-  private final String targetSnowflake;
-  private final String title;
-  private final String url;
-  private final Date releaseTime;
-  private final Date fetchTime;
+  @BsonProperty(value = "_id")
+  private ObjectId objectId;
 
-  private final List<Version> versions;
+  @BsonProperty(value = "article_id")
+  private String articleId;
 
-  public Article(final String snowflake, final String articleId, final String targetSnowflake, final String title,
-      final String url, final Date releaseTime, final Date fetchTime, final List<Version> versions) {
-    this.snowflake = snowflake;
-    this.articleId = articleId;
-    this.targetSnowflake = targetSnowflake;
-    this.title = title;
-    this.url = url;
-    this.releaseTime = releaseTime;
-    this.fetchTime = fetchTime;
-    this.versions = versions;
-  }
+  @BsonProperty(value = "target_id")
+  private ObjectId targetObjectId;
 
-  public String getArticleId() {
-    return this.articleId;
-  }
+  @BsonProperty
+  private String title;
 
-  public String getTargetSnowflake() {
-    return this.targetSnowflake;
-  }
+  @BsonProperty
+  private String url;
 
-  public String getTitle() {
-    return this.title;
-  }
+  @BsonProperty(value = "release_time")
+  private Date releaseTime;
 
-  public String getUrl() {
-    return this.url;
-  }
+  @BsonProperty(value = "fetch_time")
+  private Date fetchTime;
 
-  public Date getReleaseTime() {
-    return this.releaseTime;
-  }
-
-  public Date getFetchTime() {
-    return this.fetchTime;
-  }
-
-  public List<Version> getVersions() {
-    return this.versions;
-  }
-
-  @Override
-  public String getSnowflakeId() {
-    return this.snowflake;
-  }
+  @BsonProperty
+  private List<Version> versions;
 
   @Override
   public String toString() {
     return "Article{" +
-        "snowflake='" + snowflake + '\'' +
+        "objectId='" + objectId + '\'' +
         ", articleId='" + articleId + '\'' +
-        ", targetSnowflake='" + targetSnowflake + '\'' +
+        ", targetObjectId='" + targetObjectId + '\'' +
         ", title='" + title + '\'' +
         ", url='" + url + '\'' +
         ", releaseTime=" + releaseTime +

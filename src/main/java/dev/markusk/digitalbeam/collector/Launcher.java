@@ -39,16 +39,16 @@ public class Launcher {
     new Launcher(optionSet);
   }
 
-  private void setProperties() {
-    System.setProperty("sentry.release", VersionInfo.VERSION);
-    System.setProperty("sentry.environment", VersionInfo.DEBUG ? "development" : "production");
-  }
-
   private static OptionParser createOptionParser() {
     final OptionParser optionParser = new OptionParser();
     optionParser.accepts("debug", "Enables the debug mode");
     optionParser.accepts("help", "See help");
     return optionParser;
+  }
+
+  private void setProperties() {
+    System.setProperty("sentry.release", VersionInfo.VERSION);
+    System.setProperty("sentry.environment", VersionInfo.DEVELOPMENT_BUILD ? "development" : "production");
   }
 
 }

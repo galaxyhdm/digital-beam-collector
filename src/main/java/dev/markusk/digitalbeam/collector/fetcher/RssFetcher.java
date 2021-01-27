@@ -3,22 +3,20 @@ package dev.markusk.digitalbeam.collector.fetcher;
 import com.apptastic.rssreader.Item;
 import com.apptastic.rssreader.RssReader;
 import dev.markusk.digitalbeam.collector.Collector;
-import dev.markusk.digitalbeam.collector.interfaces.AbstractFetcher;
 import dev.markusk.digitalbeam.collector.misc.CustomRssReader;
 import dev.markusk.digitalbeam.collector.model.Article;
 import dev.markusk.digitalbeam.collector.model.Target;
-import dev.markusk.digitalbeam.collector.model.Version;
-import dev.markusk.digitalbeam.collector.model.builder.ArticleBuilder;
-import dev.markusk.digitalbeam.collector.model.builder.VersionBuilder;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.types.ObjectId;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class RssFetcher implements AbstractFetcher {
+public class RssFetcher implements Fetcher {
 
   private static final Logger LOGGER = LogManager.getLogger(Collector.class);
 
@@ -31,7 +29,10 @@ public class RssFetcher implements AbstractFetcher {
   public void initialize(final Collector collector, final Target target) {
     this.collector = collector;
     this.target = target;
-    this.rssReader = new CustomRssReader(collector.getSslBuilder(), collector.getUserAgents(), target.isTor());
+    this.rssReader =
+        new CustomRssReader(collector.getSslBuilder(),
+            collector.getDataProvider().getUserAgents().orElse(null),
+            target.isTor());
     this.simpleDateFormat = new SimpleDateFormat(target.getDatePattern(), Locale.US);
     this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
@@ -51,24 +52,17 @@ public class RssFetcher implements AbstractFetcher {
   }
 
   private Article itemToArticle(final Item item, final Date fetchTime) {
-    final ArticleBuilder articleBuilder = new ArticleBuilder();
-    articleBuilder.setArticleId(""); // TODO: 28.12.20 create article id
-    articleBuilder.setTargetSnowflake(this.target.getSnowflakeId());
-    articleBuilder.setTitle(item.getTitle().orElse(""));
-    articleBuilder.setUrl(item.getLink().orElse(""));
-    articleBuilder.setReleaseTime(this.extractDate(item.getPubDate().orElse(null)));
-    articleBuilder.setFetchTime(fetchTime);
-    articleBuilder.setVersions(List.of(this.createFirstVersion(fetchTime)));
-    return articleBuilder.createArticle();
-  }
-
-  private Version createFirstVersion(final Date updateTime) {
-    final VersionBuilder versionBuilder = new VersionBuilder();
-    //versionBuilder.setVersionId();
-    versionBuilder.setVersion(0);
-    versionBuilder.setUpdateTime(updateTime);
-    versionBuilder.setAutoOffset("0d");
-    return versionBuilder.createVersion();
+    final Article article = new Article();
+    article.setObjectId(new ObjectId());
+    article.setArticleId(
+        this.getArticleId(this.target, item.getLink().orElse("EMPTY")));
+    article.setTargetObjectId(this.target.getObjectId());
+    article.setTitle(item.getTitle().orElse(""));
+    article.setUrl(item.getLink().orElse(""));
+    article.setReleaseTime(this.extractDate(item.getPubDate().orElse(null)));
+    article.setFetchTime(fetchTime);
+    article.setVersions(List.of());
+    return article;
   }
 
   /**
@@ -90,6 +84,10 @@ public class RssFetcher implements AbstractFetcher {
       return null;
     }
     return parse;
+  }
+
+  public String getArticleId(final Target target, final String url) {
+    return target.getShortname() + "#" + DigestUtils.sha256Hex(url);
   }
 
 }

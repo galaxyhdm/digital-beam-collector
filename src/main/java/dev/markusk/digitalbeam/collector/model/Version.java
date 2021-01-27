@@ -1,57 +1,30 @@
 package dev.markusk.digitalbeam.collector.model;
 
+import lombok.Data;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
+
 import java.util.Date;
 
-public class Version implements Snowflake {
+@Data
+public class Version {
 
-  private final String snowflake;
-  private final String articleSnowflake;
-  private final String versionId;
-  private final int version;
-  private final Date updateTime;
-  private final String autoOffset;
+  @BsonProperty(value = "version_id")
+  private ObjectId objectId;
 
-  public Version(final String snowflake, final String articleSnowflake, final String versionId, final int version,
-      final Date updateTime, final String autoOffset) {
-    this.snowflake = snowflake;
-    this.articleSnowflake = articleSnowflake;
-    this.versionId = versionId;
-    this.version = version;
-    this.updateTime = updateTime;
-    this.autoOffset = autoOffset;
-  }
+  @BsonProperty
+  private int version;
 
-  public String getArticleSnowflake() {
-    return this.articleSnowflake;
-  }
+  @BsonProperty(value = "update_time")
+  private Date updateTime;
 
-  public String getVersionId() {
-    return this.versionId;
-  }
-
-  public int getVersion() {
-    return this.version;
-  }
-
-  public Date getUpdateTime() {
-    return this.updateTime;
-  }
-
-  public String getAutoOffset() {
-    return this.autoOffset;
-  }
-
-  @Override
-  public String getSnowflakeId() {
-    return this.snowflake;
-  }
+  @BsonProperty(value = "auto_offset")
+  private String autoOffset;
 
   @Override
   public String toString() {
     return "Version{" +
-        "snowflake='" + snowflake + '\'' +
-        ", articleSnowflake='" + articleSnowflake + '\'' +
-        ", versionId='" + versionId + '\'' +
+        "objectId='" + objectId + '\'' +
         ", version=" + version +
         ", updateTime=" + updateTime +
         ", autoOffset='" + autoOffset + '\'' +
