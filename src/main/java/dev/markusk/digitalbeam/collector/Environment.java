@@ -16,4 +16,6 @@ public class Environment {
   public static final String CERT_URL =
       System.getenv("CERT_URL") != null ? String.valueOf(System.getenv("CERT_URL")) : "";
 
+  public static final String PROXY_ADDRESS =
+      System.getenv("PROXY_ADDRESS") != null ? String.valueOf(System.getenv("PROXY_ADDRESS")) : "";
 }

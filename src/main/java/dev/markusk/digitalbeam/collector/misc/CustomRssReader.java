@@ -2,6 +2,7 @@ package dev.markusk.digitalbeam.collector.misc;
 
 import com.apptastic.rssreader.RssReader;
 import dev.markusk.digitalbeam.collector.Collector;
+import dev.markusk.digitalbeam.collector.Environment;
 import dev.markusk.digitalbeam.collector.model.UserAgent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,11 +29,19 @@ public class CustomRssReader extends RssReader {
   private final List<UserAgent> userAgents;
   private final HttpClient httpClient;
 
+  private Proxy proxy;
+
   public CustomRssReader(final SslBuilder sslBuilder, final List<UserAgent> userAgents, boolean tor) {
     this.sslBuilder = sslBuilder;
     this.userAgents = userAgents;
     this.tor = tor;
     this.httpClient = this.createHttpClient();
+
+    if (this.tor) {
+      final SocketAddress socketAddress = this.getSocketAddress();
+      if (socketAddress == null) return;
+      this.proxy = new Proxy(Proxy.Type.HTTP, socketAddress);
+    }
   }
 
   @Override
@@ -67,8 +76,8 @@ public class CustomRssReader extends RssReader {
         .proxy(new ProxySelector() {
           @Override
           public List<Proxy> select(final URI uri) {
-            return CustomRssReader.this.tor
-                ? List.of(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8118)))
+            return CustomRssReader.this.tor && CustomRssReader.this.proxy != null
+                ? List.of(CustomRssReader.this.proxy)
                 : List.of();
           }
 
@@ -77,6 +86,21 @@ public class CustomRssReader extends RssReader {
             LOGGER.warn("Proxy not available!", ioe);
           }
         }).build();
+  }
+
+  private SocketAddress getSocketAddress() {
+    try {
+      final String address = Environment.PROXY_ADDRESS;
+      if (address.isEmpty()) return null;
+      if (!address.contains(":")) return null;
+      final String[] split = address.split(":");
+      final String hostname = split[0];
+      final int port = Integer.parseInt(split[1]);
+      return new InetSocketAddress(hostname, port);
+    } catch (NumberFormatException e) {
+      LOGGER.warn("Could not pars port in proxy-address! No proxy will by used!");
+    }
+    return null;
   }
 
 }
