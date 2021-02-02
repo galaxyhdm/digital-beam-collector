@@ -49,6 +49,7 @@ public class Launcher {
   private void setProperties() {
     System.setProperty("sentry.release", VersionInfo.VERSION);
     System.setProperty("sentry.environment", VersionInfo.DEVELOPMENT_BUILD ? "development" : "production");
+    System.setProperty("user.timezone", "UTC");
   }
 
 }

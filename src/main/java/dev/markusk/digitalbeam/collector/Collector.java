@@ -6,11 +6,15 @@ import dev.markusk.digitalbeam.collector.data.DataProvider;
 import dev.markusk.digitalbeam.collector.data.DataProviderCache;
 import dev.markusk.digitalbeam.collector.data.MongoDataProvider;
 import dev.markusk.digitalbeam.collector.fetcher.FetcherController;
+import dev.markusk.digitalbeam.collector.fetcher.FetcherExecutor;
 import dev.markusk.digitalbeam.collector.fetcher.FetcherRegistry;
 import dev.markusk.digitalbeam.collector.misc.SslBuilder;
 import joptsimple.OptionSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static dev.markusk.digitalbeam.collector.Environment.DEBUG;
+import static dev.markusk.digitalbeam.collector.Environment.POOL_SIZE;
 
 public class Collector {
 
@@ -23,6 +27,7 @@ public class Collector {
   private DataProvider dataProvider;
 
   private FetcherRegistry fetcherRegistry;
+  private FetcherExecutor fetcherExecutor;
   private FetcherController fetcherController;
 
   private SslBuilder sslBuilder;
@@ -37,7 +42,7 @@ public class Collector {
     if (this.running) return;
     this.running = true;
     this.setupConsole();
-    //LOGGER.debug("NO_FETCH=" +  + " DEBUG=" + DEBUG + " POOL_SIZE=" + POOL_SIZE);
+    LOGGER.debug("DEBUG=" + DEBUG + " POOL_SIZE=" + POOL_SIZE);
     LOGGER.info(String
         .format("Starting collector... (Version Nr. %s built on %s at %s)", VersionInfo.VERSION, VersionInfo.BUILD_DATE,
             VersionInfo.BUILD_TIME));
@@ -52,6 +57,9 @@ public class Collector {
 
     this.fetcherRegistry = new FetcherRegistry(this);
     this.fetcherRegistry.registerFetchers();
+
+    this.fetcherExecutor = new FetcherExecutor();
+    this.fetcherExecutor.initializeScheduler();
 
     this.fetcherController = new FetcherController(this, this.fetcherRegistry);
     this.fetcherController.initializeJobs();
@@ -69,9 +77,13 @@ public class Collector {
     return this.persistentDataProvider;
   }
 
+  public FetcherExecutor getFetcherExecutor() {
+    return this.fetcherExecutor;
+  }
+
   private void setupConsole() {
     this.consoleController =
-        new ConsoleController(this.optionSet.has("debug") || Environment.DEBUG, false);
+        new ConsoleController(this.optionSet.has("debug") || DEBUG, false);
     this.consoleController.setupConsole();
     new BetterSystemOut(LOGGER).overwrite();
   }

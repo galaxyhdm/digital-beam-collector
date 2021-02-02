@@ -5,6 +5,7 @@ import dev.markusk.digitalbeam.collector.model.Target;
 import dev.markusk.digitalbeam.collector.model.UserAgent;
 import org.bson.types.ObjectId;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,8 @@ public interface DataProvider {
   Optional<Article> getArticle(ObjectId objectId);
 
   Optional<Article> getArticleById(String articleId);
+
+  Optional<List<Article>> getLookupArticles(Date date);
 
   void updateArticle(Article article);
 

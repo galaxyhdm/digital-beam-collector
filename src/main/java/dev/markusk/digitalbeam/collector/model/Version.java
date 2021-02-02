@@ -18,8 +18,8 @@ public class Version {
   @BsonProperty(value = "update_time")
   private Date updateTime;
 
-  @BsonProperty(value = "auto_offset")
-  private String autoOffset;
+  @BsonProperty
+  private long offset;
 
   @Override
   public String toString() {
@@ -27,7 +27,7 @@ public class Version {
         "objectId='" + objectId + '\'' +
         ", version=" + version +
         ", updateTime=" + updateTime +
-        ", autoOffset='" + autoOffset + '\'' +
+        ", offset='" + offset + '\'' +
         '}';
   }
 }

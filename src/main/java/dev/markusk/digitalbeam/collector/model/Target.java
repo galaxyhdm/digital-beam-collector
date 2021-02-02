@@ -4,6 +4,8 @@ import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
+import java.util.List;
+
 @Data
 public class Target {
 
@@ -34,6 +36,9 @@ public class Target {
   @BsonProperty(value = "fetcher_class_path")
   private String fetcherClassPath;
 
+  @BsonProperty(value = "lookup_offsets")
+  private List<String> lookupOffsets;
+
   @BsonProperty
   private boolean active;
 
@@ -48,6 +53,7 @@ public class Target {
         ", waitTime=" + waitTime +
         ", datePattern='" + datePattern + '\'' +
         ", lastUrl='" + lastUrl + '\'' +
+        ", lookupOffsets='" + lookupOffsets + '\'' +
         ", active=" + active +
         '}';
   }

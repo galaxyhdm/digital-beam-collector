@@ -12,15 +12,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.lte;
 
 public class MongoDataProvider implements DataProvider {
 
@@ -76,6 +74,13 @@ public class MongoDataProvider implements DataProvider {
   }
 
   @Override
+  public Optional<List<Article>> getLookupArticles(final Date date) {
+    Objects.requireNonNull(date, "Date is null");
+    final FindIterable<Article> articleFindIterable = this.articleCollection.find(lte("queued_lookups", date));
+    return Optional.of(this.toList(articleFindIterable));
+  }
+
+  @Override
   public void updateArticle(final Article article) {
     Objects.requireNonNull(article, "Article is null");
     Objects.requireNonNull(article.getObjectId(), "ObjectId is null");
@@ -127,6 +132,12 @@ public class MongoDataProvider implements DataProvider {
   @Override
   public void close() {
     this.mongoConnector.disconnect();
+  }
+
+  private <T> List<T> toList(final FindIterable<T> findIterable) {
+    final ArrayList<T> objects = new ArrayList<>();
+    findIterable.forEach((Consumer<? super T>) objects::add);
+    return objects;
   }
 
 }

@@ -34,6 +34,9 @@ public class Article {
   @BsonProperty
   private List<Version> versions;
 
+  @BsonProperty(value = "queued_lookups")
+  private List<Date> queuedLookups;
+
   @Override
   public String toString() {
     return "Article{" +
@@ -45,6 +48,7 @@ public class Article {
         ", releaseTime=" + releaseTime +
         ", fetchTime=" + fetchTime +
         ", versions=" + versions +
+        ", queuedLookups=" + queuedLookups +
         '}';
   }
 }

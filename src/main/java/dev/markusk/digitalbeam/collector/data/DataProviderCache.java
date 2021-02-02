@@ -14,10 +14,7 @@ import org.cache2k.CacheEntry;
 import org.cache2k.io.AsyncCacheLoader;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class DataProviderCache implements DataProvider {
@@ -71,6 +68,11 @@ public class DataProviderCache implements DataProvider {
       articleById.ifPresent(article -> this.articleCache.put(article.getObjectId(), articleById));
       return articleById;
     });
+  }
+
+  @Override
+  public Optional<List<Article>> getLookupArticles(final Date date) {
+    return this.persistentDataProvider.getLookupArticles(date);
   }
 
   @Override

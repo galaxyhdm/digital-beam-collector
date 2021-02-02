@@ -2,16 +2,18 @@ package dev.markusk.digitalbeam.collector.fetcher;
 
 import dev.markusk.digitalbeam.collector.Collector;
 import dev.markusk.digitalbeam.collector.data.DataProvider;
+import dev.markusk.digitalbeam.collector.misc.VersionCreator;
 import dev.markusk.digitalbeam.collector.model.Article;
 import dev.markusk.digitalbeam.collector.model.Target;
-import dev.markusk.digitalbeam.collector.model.Version;
+import dev.markusk.digitalbeam.collector.time.OffsetCalculator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bson.types.ObjectId;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class CollectJob extends TimerTask {
+public class CollectJob extends ScheduledJob {
 
   private static final Logger LOGGER = LogManager.getLogger();
 
@@ -29,6 +31,7 @@ public class CollectJob extends TimerTask {
 
   @Override
   public void run() {
+    this.addAttempt();
     try {
       final List<Article> fetchInfos = this.fetcher.getFetchInfos();
       final String lastUrl = this.target.getLastUrl();
@@ -40,43 +43,26 @@ public class CollectJob extends TimerTask {
           filteredInfos.size() == 1 ? "" : "s"));
 
       if (filteredInfos.size() <= 0) return;
-      filteredInfos.forEach(this::updateOrInsertArticle);
+      filteredInfos.forEach(this::updateArticle);
 
       this.updateLastUrl(filteredInfos);
     } catch (Exception exception) {
-      LOGGER.error(String.format("Error while fetching infos from: %s", this.target.getShortname()), exception);
+      this.checkAttempts(
+          () -> this.collector.getFetcherExecutor().scheduleJob(this),
+          () -> LOGGER.error(String.format("Error while fetching infos: %s", this.target.getShortname()), exception));
     }
   }
 
-  private void updateOrInsertArticle(final Article article) {
-    final Optional<Article> articleById = this.dataProvider.getArticleById(article.getArticleId());
-    articleById.ifPresentOrElse(this::updateArticle, () -> this.updateArticle(article));
-    articleById.ifPresentOrElse(
-        data -> LOGGER.debug(String.format("Present in database (%s), updating versions", data.getObjectId())),
-        () -> LOGGER.debug(String.format("Not present in database, inserting article (%s)", article.getObjectId())));
-  }
-
   private void updateArticle(final Article article) {
-    final List<Version> versions = this.updateVersionList(article);
-    article.setVersions(versions);
-    this.dataProvider.updateArticle(article);
+    this.setQueuedLookups(article);
+    VersionCreator.builder(article).setOffset(0).updateOrInsertArticle(this.dataProvider);
   }
 
-  private List<Version> updateVersionList(final Article article) {
-    final List<Version> versions =
-        article.getVersions() != null ? new ArrayList<>(article.getVersions()) : new ArrayList<>();
-    final Version newVersion = this.createVersion(versions.size() != 0 ? versions.get(versions.size() - 1) : null);
-    versions.add(newVersion);
-    return versions;
-  }
-
-  private Version createVersion(final Version previousVersion) {
-    final Version version = new Version();
-    version.setObjectId(new ObjectId());
-    version.setVersion(previousVersion != null ? previousVersion.getVersion() + 1 : 0);
-    version.setUpdateTime(new Date());
-    version.setAutoOffset("0d");
-    return version;
+  private void setQueuedLookups(final Article article) {
+    final List<Date> lookups = this.target.getLookupOffsets().stream()
+        .map(s -> OffsetCalculator.calculate(s, article.getReleaseTime()))
+        .collect(Collectors.toList());
+    article.setQueuedLookups(lookups);
   }
 
   private void updateLastUrl(final List<Article> filteredInfos) {
@@ -94,5 +80,4 @@ public class CollectJob extends TimerTask {
 
     return lastInfo == null ? fetchInfos : fetchInfos.subList(0, fetchInfos.indexOf(lastInfo));
   }
-
 }
