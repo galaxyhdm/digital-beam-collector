@@ -30,7 +30,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.influxdb/influxdb-java
     implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.21'
     //Sentry
-    implementation 'io.sentry:sentry-log4j2:3.2.1'
+    implementation 'io.sentry:sentry-log4j2:4.0.0'
     // https://github.com/w3stling/rssreader
     implementation 'com.apptastic:rssreader:2.4.1'
     // https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver
