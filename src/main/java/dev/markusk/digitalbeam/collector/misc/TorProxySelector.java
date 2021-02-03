@@ -36,7 +36,7 @@ public class TorProxySelector extends ProxySelector {
     if (this.useTorProxy) {
       final SocketAddress socketAddress = this.getSocketAddress();
       if (socketAddress == null) return List.of();
-      this.torProxy = new Proxy(Proxy.Type.HTTP, socketAddress);
+      this.torProxy = new Proxy(Proxy.Type.SOCKS, socketAddress);
     }
     return this.torProxy != null ? List.of(this.torProxy) : List.of();
   }
