@@ -35,7 +35,7 @@ public class CollectJob extends ScheduledJob {
     try {
       final List<Article> fetchInfos = this.fetcher.getFetchInfos();
       final String lastUrl = this.target.getLastUrl();
-      final List<Article> filteredInfos = this.getFilteredInfos(fetchInfos, lastUrl);
+      final List<Article> filteredInfos = this.filterArticles(fetchInfos, lastUrl);
 
       LOGGER.info(String.format("%s | Got %d new article%s",
           this.target.getShortname(),
@@ -73,6 +73,15 @@ public class CollectJob extends ScheduledJob {
     this.dataProvider.updateLastUrl(this.target);
   }
 
+  private List<Article> filterArticles(final List<Article> fetchInfos, final String lastUrl) {
+    final List<Article> filteredInfos = this.getFilteredInfos(fetchInfos, lastUrl);
+    LOGGER.debug(String.format("%s | Got %d article%s after last-url-filter",
+        this.target.getShortname(),
+        filteredInfos.size(),
+        filteredInfos.size() == 1 ? "" : "s"));
+    return this.filterNotExistingArticles(filteredInfos);
+  }
+
   private List<Article> getFilteredInfos(final List<Article> fetchInfos, final String lastUrl) {
     final Article lastInfo = fetchInfos.stream().filter(
         article -> article.getUrl().equals(lastUrl))
@@ -80,4 +89,10 @@ public class CollectJob extends ScheduledJob {
 
     return lastInfo == null ? fetchInfos : fetchInfos.subList(0, fetchInfos.indexOf(lastInfo));
   }
+
+  private List<Article> filterNotExistingArticles(final List<Article> articles) {
+    return articles.stream().filter(article -> this.dataProvider.getArticleById(article.getArticleId()).isEmpty())
+        .collect(Collectors.toList());
+  }
+
 }
