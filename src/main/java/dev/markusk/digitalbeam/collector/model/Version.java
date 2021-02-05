@@ -21,6 +21,9 @@ public class Version {
   @BsonProperty
   private long offset;
 
+  @BsonProperty
+  private VersionStatus status;
+
   @Override
   public String toString() {
     return "Version{" +

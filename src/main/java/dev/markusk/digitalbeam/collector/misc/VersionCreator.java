@@ -3,6 +3,7 @@ package dev.markusk.digitalbeam.collector.misc;
 import dev.markusk.digitalbeam.collector.data.DataProvider;
 import dev.markusk.digitalbeam.collector.model.Article;
 import dev.markusk.digitalbeam.collector.model.Version;
+import dev.markusk.digitalbeam.collector.model.VersionStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -71,6 +72,7 @@ public class VersionCreator {
     version.setVersion(previousVersion != null ? previousVersion.getVersion() + 1 : 0);
     version.setUpdateTime(this.updateTime != null ? this.updateTime : new Date());
     version.setOffset(this.offset);
+    version.setStatus(VersionStatus.COLLECTED);
     return version;
   }
 
