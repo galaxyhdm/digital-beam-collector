@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public enum TimeShortcut {
 
+  HOUR('h', Calendar.HOUR_OF_DAY),
   DAY('d', Calendar.DAY_OF_MONTH),
   WEEK('w', Calendar.WEEK_OF_MONTH),
   MONTH('m', Calendar.MONTH),
